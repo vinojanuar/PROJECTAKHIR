@@ -1,153 +1,130 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
-    );
-  }
+  State<Homescreen> createState() => _HomescreenState();
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white,
-        backgroundColor: Colors.blue.shade900,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code), label: 'Scan'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Kehadiran'),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Maps'),
-        ],
-      ),
+      backgroundColor: Colors.grey[200],
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: 260, // Lebih tinggi supaya muat semua
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade900,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(40),
-                      bottomRight: Radius.circular(40),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      SizedBox(height: 40),
-                      Text(
-                        'MORNING',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Muhammad Rio Akbar',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                      Text(
-                        '123456789',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                      SizedBox(height: 20),
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: AssetImage(
-                          "assets/images/profile.png",
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20), // Spasi bawah setelah Stack
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            Container(
+              margin: EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Column(
                 children: [
-                  const Text(
-                    'Distance from place',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    '250.43m',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 15,
-                          ),
-                        ),
-                        onPressed: () {},
-                        child: const Text(
-                          "Check In\n07 : 50 : 00",
-                          textAlign: TextAlign.center,
-                        ),
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.blue,
+                        child: Icon(Icons.person, color: Colors.white),
                       ),
-                      const SizedBox(width: 20),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 15,
+                      SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Semangat Pagi",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        onPressed: () {},
-                        child: const Text(
-                          "Check Out\n17 : 50 : 00",
-                          textAlign: TextAlign.center,
-                        ),
+                          Text(
+                            "Semangat Pagi",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text("Muhammad Rio Akbar"),
+                          Text("123456789"),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: const [
-                      Icon(Icons.location_on, color: Colors.red),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          'Jl. Pangeran Diponegoro No 5, Kec. Medan Petisah, Kota Medan, Sumatera Utara',
-                          style: TextStyle(fontSize: 14),
+                  SizedBox(height: 16),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Jl. Pangeran Diponegoro No. 5, Kec. Medan Petisah, Kota Medan, Sumatera Utara",
+                          textAlign: TextAlign.center,
                         ),
+                        SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                Text("Check In"),
+                                Text(
+                                  "07 : 50 : 00",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text("Check Out"),
+                                Text(
+                                  "17 : 50 : 00",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Distance from place\n250.43m",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text("Open Maps"),
                       ),
                     ],
                   ),
                 ],
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text(
+                    "Riwayat Kehadiran",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text("Lihat Semua", style: TextStyle(color: Colors.blue)),
+                ],
+              ),
+            ),
+            SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: attendanceHistory.length,
+              itemBuilder: (context, index) {},
             ),
           ],
         ),

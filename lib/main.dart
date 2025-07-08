@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projectakhir/screen/homescreen.dart';
 import 'package:projectakhir/screen/registerscreen.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Perpustakaan',
       theme: ThemeData(primarySwatch: Colors.pink),
-      home: const Regisscreen(),
+      home: const Homescreen(),
     );
   }
 }

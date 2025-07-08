@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projectakhir/screen/loginscreen.dart';
 
 void main() {
   runApp(const Regisscreen());
@@ -28,7 +29,10 @@ class RegisterPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Loginscreen()),
+            );
           },
         ),
       ),
@@ -45,7 +49,7 @@ class RegisterPage extends StatelessWidget {
             const SizedBox(height: 24),
             TextField(
               decoration: InputDecoration(
-                hintText: "Nama",
+                labelText: "Nama",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -54,7 +58,7 @@ class RegisterPage extends StatelessWidget {
             const SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
-                hintText: "No HP",
+                labelText: "No HP",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -64,7 +68,7 @@ class RegisterPage extends StatelessWidget {
             const SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
-                hintText: "Email",
+                labelText: "Email",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -75,7 +79,7 @@ class RegisterPage extends StatelessWidget {
             TextField(
               obscureText: true,
               decoration: InputDecoration(
-                hintText: "Kata Sandi",
+                labelText: "Kata Sandi",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -94,7 +98,13 @@ class RegisterPage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {},
-                child: const Text("Register"),
+                child: const Text(
+                  "Register",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],

@@ -42,7 +42,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   const SizedBox(height: 20),
                   TextField(
                     decoration: InputDecoration(
-                      hintText: "Email",
+                      labelText: "Email",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -52,7 +52,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   TextField(
                     obscureText: true,
                     decoration: InputDecoration(
-                      hintText: "Kata Sandi",
+                      labelText: "Kata Sandi",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
