@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projectakhir/screen/homescreen.dart';
-import 'package:projectakhir/screen/registerscreen.dart';
+import 'package:projectakhir/screen/loginscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,9 +12,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Perpustakaan',
+      title: 'Absensi',
       theme: ThemeData(primarySwatch: Colors.pink),
-      home: const Homescreen(),
+      home: const Loginscreen(),
     );
   }
 }
