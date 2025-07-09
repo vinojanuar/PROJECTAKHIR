@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:projectakhir/Gmaps/maps_page.dart';
 import 'package:projectakhir/screen/profilscreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -176,7 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue.shade900,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            // Panggil MapsPage menggunakan Navigator.push
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MapsPage(),
+                              ),
+                            );
+                          },
                           child: const Text(
                             "Open Maps",
                             style: TextStyle(color: Colors.white),
