@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projectakhir/screen/profilscreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -324,7 +325,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 24,
               ),
               onPressed: () {
-                // Aksi Profil
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
               },
             ),
           ],

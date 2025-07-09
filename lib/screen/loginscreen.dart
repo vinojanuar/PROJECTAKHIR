@@ -1,27 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:projectakhir/api/user_api.dart';
+import 'package:projectakhir/screen/homescreen.dart';
 import 'package:projectakhir/screen/registerscreen.dart';
 
-void main() {
-  runApp(const Loginscreen());
-}
-
-class Loginscreen extends StatelessWidget {
+class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: const LoginScreen());
+  State<Loginscreen> createState() => _LoginscreenState();
+}
+
+class _LoginscreenState extends State<Loginscreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final UserService userService = UserService();
+
+  bool isLoading = false;
+
+  bool _obscureText = true;
+
+  void login() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final res = await userService.loginUser(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+
+    if (res["data"] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Login berhasil!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Pindah ke halaman profile
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } else if (res["errors"] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Maaf, ${res["message"]}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
-}
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   TextField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       labelText: "Email",
                       border: OutlineInputBorder(
@@ -64,13 +99,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    obscureText: true,
+                    controller: passwordController,
+                    obscureText: _obscureText,
                     decoration: InputDecoration(
                       labelText: "Kata Sandi",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      suffixIcon: const Icon(Icons.visibility_off),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText; // Toggle Show/Hide
+                          });
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -84,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: isLoading ? null : login,
                       child: const Text(
                         "Log in",
                         style: TextStyle(
