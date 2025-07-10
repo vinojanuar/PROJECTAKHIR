@@ -1,78 +1,74 @@
 // To parse this JSON data, do
 //
-//     final absenCheckin = absenCheckinFromJson(jsonString);
+//     final checkIn = checkInFromJson(jsonString);
 
 import 'dart:convert';
 
-AbsenCheckin absenCheckinFromJson(String str) =>
-    AbsenCheckin.fromJson(json.decode(str));
+CheckIn checkInFromJson(String str) => CheckIn.fromJson(json.decode(str));
 
-String absenCheckinToJson(AbsenCheckin data) => json.encode(data.toJson());
+String checkInToJson(CheckIn data) => json.encode(data.toJson());
 
-class AbsenCheckin {
-  String message;
-  Data data;
+class CheckIn {
+  String? message;
+  Data? data;
 
-  AbsenCheckin({required this.message, required this.data});
+  CheckIn({this.message, this.data});
 
-  factory AbsenCheckin.fromJson(Map<String, dynamic> json) =>
-      AbsenCheckin(message: json["message"], data: Data.fromJson(json["data"]));
+  factory CheckIn.fromJson(Map<String, dynamic> json) => CheckIn(
+    message: json["message"],
+    data: json["data"] == null ? null : Data.fromJson(json["data"]),
+  );
 
-  Map<String, dynamic> toJson() => {"message": message, "data": data.toJson()};
+  Map<String, dynamic> toJson() => {"message": message, "data": data?.toJson()};
 }
 
 class Data {
-  int userId;
-  String checkIn;
-  String checkInLocation;
-  double checkInLat;
-  double checkInLng;
-  String checkInAddress;
-  String status;
+  int? id;
+  DateTime? attendanceDate;
+  String? checkInTime;
+  double? checkInLat;
+  double? checkInLng;
+  String? checkInLocation;
+  String? checkInAddress;
+  String? status;
   dynamic alasanIzin;
-  String updatedAt;
-  String createdAt;
-  int id;
 
   Data({
-    required this.userId,
-    required this.checkIn,
-    required this.checkInLocation,
-    required this.checkInLat,
-    required this.checkInLng,
-    required this.checkInAddress,
-    required this.status,
-    required this.alasanIzin,
-    required this.updatedAt,
-    required this.createdAt,
-    required this.id,
+    this.id,
+    this.attendanceDate,
+    this.checkInTime,
+    this.checkInLat,
+    this.checkInLng,
+    this.checkInLocation,
+    this.checkInAddress,
+    this.status,
+    this.alasanIzin,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    userId: json["user_id"],
-    checkIn: json["check_in"],
-    checkInLocation: json["check_in_location"],
+    id: json["id"],
+    attendanceDate: json["attendance_date"] == null
+        ? null
+        : DateTime.parse(json["attendance_date"]),
+    checkInTime: json["check_in_time"],
     checkInLat: json["check_in_lat"]?.toDouble(),
     checkInLng: json["check_in_lng"]?.toDouble(),
+    checkInLocation: json["check_in_location"],
     checkInAddress: json["check_in_address"],
     status: json["status"],
     alasanIzin: json["alasan_izin"],
-    updatedAt: json["updated_at"],
-    createdAt: json["created_at"],
-    id: json["id"],
   );
 
   Map<String, dynamic> toJson() => {
-    "user_id": userId,
-    "check_in": checkIn,
-    "check_in_location": checkInLocation,
+    "id": id,
+    "attendance_date":
+        "${attendanceDate!.year.toString().padLeft(4, '0')}-${attendanceDate!.month.toString().padLeft(2, '0')}-${attendanceDate!.day.toString().padLeft(2, '0')}",
+    "check_in_time": checkInTime,
     "check_in_lat": checkInLat,
     "check_in_lng": checkInLng,
+    "check_in_location": checkInLocation,
     "check_in_address": checkInAddress,
     "status": status,
     "alasan_izin": alasanIzin,
-    "updated_at": updatedAt,
-    "created_at": createdAt,
-    "id": id,
   };
 }

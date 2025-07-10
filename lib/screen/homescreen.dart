@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:projectakhir/Gmaps/maps_page.dart';
+import 'package:projectakhir/endpoint/endpoint.dart';
+import 'package:projectakhir/helper/preference.dart';
 import 'package:projectakhir/screen/profilscreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,26 +19,121 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Map<String, String>> attendanceHistory = [
-    {
-      'day': 'Monday',
-      'date': '13-Jun-25',
-      'checkIn': '07 : 50 : 00',
-      'checkOut': '17 : 50 : 00',
-    },
-    {
-      'day': 'Monday',
-      'date': '13-Jun-25',
-      'checkIn': '07 : 50 : 00',
-      'checkOut': '17 : 50 : 00',
-    },
-    {
-      'day': 'Monday',
-      'date': '13-Jun-25',
-      'checkIn': '07 : 50 : 00',
-      'checkOut': '17 : 50 : 00',
-    },
-  ];
+  String checkInTime = "-- : -- : --";
+  String checkOutTime = "-- : -- : --";
+  LatLng _currentPosition = const LatLng(0.0, 0.0);
+  String _currentAddress = "Belum Diketahui";
+
+  Future<void> _ambilLokasiDanAlamat() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) throw "GPS tidak aktif!";
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          throw "Izin lokasi ditolak.";
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentPosition = LatLng(position.latitude, position.longitude);
+      });
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      Placemark place = placemarks.first;
+      setState(() {
+        _currentAddress =
+            "${place.street}, ${place.subLocality}, ${place.locality}";
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error Lokasi: $e")));
+    }
+  }
+
+  Future<void> _checkIn() async {
+    await _ambilLokasiDanAlamat();
+    final token = await PreferenceHandler.getToken();
+    final now = DateTime.now();
+    final tanggal = DateFormat('yyyy-MM-dd').format(now);
+    final jam = DateFormat('HH:mm').format(now);
+
+    final response = await http.post(
+      Uri.parse(Endpoint.checkIn),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'attendance_date': tanggal,
+        'check_in': jam,
+        'check_in_lat': _currentPosition.latitude,
+        'check_in_lng': _currentPosition.longitude,
+        'check_in_address': _currentAddress,
+        'status': 'masuk',
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        checkInTime = jam;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Check In Berhasil")));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Check In Gagal")));
+    }
+  }
+
+  Future<void> _checkOut() async {
+    await _ambilLokasiDanAlamat();
+    final token = await PreferenceHandler.getToken();
+    final now = DateTime.now();
+    final tanggal = DateFormat('yyyy-MM-dd').format(now);
+    final jam = DateFormat('HH:mm').format(now);
+
+    final response = await http.post(
+      Uri.parse(Endpoint.checkOut),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'attendance_date': tanggal,
+        'check_out': jam,
+        'check_out_lat': _currentPosition.latitude,
+        'check_out_lng': _currentPosition.longitude,
+        'check_out_address': _currentAddress,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        checkOutTime = jam;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Check Out Berhasil")));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Check Out Gagal")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Color(0xff84BFFF),
+                      color: const Color(0xff84BFFF),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -91,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 12),
                         Container(
-                          padding: EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 119, 165, 243),
                             borderRadius: BorderRadius.circular(12),
@@ -101,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Column(
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Check In",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -109,10 +210,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    "07 : 50 : 00",
-                                    style: TextStyle(
+                                    checkInTime,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 19,
                                       color: Colors.white,
@@ -121,13 +222,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                               Container(
-                                width: 2, // Lebar garis
-                                height: 70, // Tinggi garis
-                                color: Colors.white, // Warna garis
+                                width: 2,
+                                height: 70,
+                                color: Colors.white,
                               ),
                               Column(
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Check Out",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -135,10 +236,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    "17 : 50 : 00",
-                                    style: TextStyle(
+                                    checkOutTime,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 19,
                                       color: Colors.white,
@@ -164,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
+                          children: const [
                             Text("Distance from place"),
                             SizedBox(height: 4),
                             Text(
@@ -181,7 +282,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             backgroundColor: Colors.blue.shade900,
                           ),
                           onPressed: () {
-                            // Panggil MapsPage menggunakan Navigator.push
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -200,115 +300,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Riwayat Kehadiran",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    "Lihat Semua",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 137, 248),
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListView.builder(
-              //Riwayat Kehadiran
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: attendanceHistory.length,
-              itemBuilder: (context, index) {
-                final data = attendanceHistory[index];
-                return Container(
-                  width: 321,
-                  height: 81,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Kolom Hari & Tanggal
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            data['day'] ?? '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            data['date'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Kolom Check In & Check Out
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text("Check In"),
-                              const SizedBox(height: 4),
-                              Text(
-                                data['checkIn'] ?? '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text("Check Out"),
-                              const SizedBox(height: 4),
-                              Text(
-                                data['checkOut'] ?? '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue[300],
         onPressed: () {
-          // Aksi untuk Kehadiran
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Pilih Aksi"),
+                content: const Text("Silakan pilih aksi yang ingin dilakukan:"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _checkIn();
+                    },
+                    child: const Text("Check In"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _checkOut();
+                    },
+                    child: const Text("Check Out"),
+                  ),
+                ],
+              );
+            },
+          );
         },
         child: Image.asset('assets/images/presence.png', width: 32, height: 32),
       ),
@@ -325,11 +347,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 24,
                 height: 24,
               ),
-              onPressed: () {
-                // Aksi Home
-              },
+              onPressed: () {},
             ),
-            const SizedBox(width: 48), // Space for FAB
+            const SizedBox(width: 48),
             IconButton(
               icon: Image.asset(
                 'assets/images/user.png',
