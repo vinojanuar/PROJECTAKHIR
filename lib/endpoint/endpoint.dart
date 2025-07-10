@@ -5,7 +5,7 @@ class Endpoint {
   static const String login = "$baseUrlApi/login";
   static const String batch = "$baseUrlApi/batches";
   static const String training = "$baseUrlApi/trainings";
-
   static const String checkIn = "$baseUrlApi/absen/check-in";
   static const String checkOut = "$baseUrlApi/absen/check-out";
+  static const String history = "$baseUrlApi/absen/history";
 }

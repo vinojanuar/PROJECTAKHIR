@@ -6,14 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:projectakhir/api/absensi_service.dart';
 import 'package:projectakhir/model/checkin_model.dart';
 
-class KehadiranPage extends StatefulWidget {
-  const KehadiranPage({super.key});
+class CheckinScreen extends StatefulWidget {
+  const CheckinScreen({super.key});
 
   @override
-  State<KehadiranPage> createState() => _KehadiranPageState();
+  State<CheckinScreen> createState() => _CheckinScreenState();
 }
 
-class _KehadiranPageState extends State<KehadiranPage> {
+class _CheckinScreenState extends State<CheckinScreen> {
   final String _statusCheckIn = "Belum Check In";
   String _currentAddress = "Belum Diketahui";
   LatLng _currentPosition = const LatLng(-6.2, 106.8);

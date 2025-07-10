@@ -4,6 +4,7 @@ import 'package:projectakhir/helper/preference.dart';
 import 'package:projectakhir/model/Register_response/register_model_berhasil.dart';
 import 'package:projectakhir/model/Register_response/register_model_gagal.dart';
 import 'package:projectakhir/model/batch_model.dart';
+import 'package:projectakhir/model/historyabsen_model.dart';
 import 'package:projectakhir/model/training_model.dart';
 
 class UserService {
@@ -105,6 +106,33 @@ class UserService {
     } else {
       print("Failed to fetch training list: ${response.statusCode}");
       throw Exception("Failed to fetch training list: ${response.statusCode}");
+    }
+  }
+
+  /// Get History Absen
+  static Future<HistoryAbsen?> getHistoryAbsen() async {
+    try {
+      final token = await PreferenceHandler.getToken();
+      final response = await http.get(
+        Uri.parse('${Endpoint.baseUrl}/absen/history'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final historyAbsen = historyAbsenFromJson(response.body);
+        return historyAbsen;
+      } else {
+        throw Exception(
+          'Gagal mengambil data history absen: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('Error getHistoryAbsen: $e');
+      return null;
     }
   }
 }

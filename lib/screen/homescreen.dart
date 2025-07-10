@@ -1,15 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:projectakhir/Gmaps/maps_page.dart';
-import 'package:projectakhir/endpoint/endpoint.dart';
-import 'package:projectakhir/helper/preference.dart';
 import 'package:projectakhir/screen/profilscreen.dart';
+import 'package:projectakhir/screen/checkin_screen.dart'; // Ubah nama file checkin_screen.dart sesuai nama aslimu
+import 'package:projectakhir/api/absensi_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,66 +60,57 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _checkIn() async {
-    await _ambilLokasiDanAlamat();
-    final token = await PreferenceHandler.getToken();
-    final now = DateTime.now();
-    final tanggal = DateFormat('yyyy-MM-dd').format(now);
-    final jam = DateFormat('HH:mm').format(now);
-
-    final response = await http.post(
-      Uri.parse(Endpoint.checkIn),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'attendance_date': tanggal,
-        'check_in': jam,
-        'check_in_lat': _currentPosition.latitude,
-        'check_in_lng': _currentPosition.longitude,
-        'check_in_address': _currentAddress,
-        'status': 'masuk',
-      }),
+  void _navigateToCheckIn() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CheckinScreen()),
     );
 
-    if (response.statusCode == 200) {
+    if (result != null) {
       setState(() {
-        checkInTime = jam;
+        checkInTime = result;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Check In Berhasil")));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Check In Gagal")));
     }
   }
 
-  Future<void> _checkOut() async {
+  void _showCheckOutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Konfirmasi Check Out"),
+        content: const Text("Apakah Anda yakin ingin Check Out sekarang?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _performCheckOut();
+            },
+            child: const Text("Check Out"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performCheckOut() async {
     await _ambilLokasiDanAlamat();
-    final token = await PreferenceHandler.getToken();
     final now = DateTime.now();
     final tanggal = DateFormat('yyyy-MM-dd').format(now);
     final jam = DateFormat('HH:mm').format(now);
 
-    final response = await http.post(
-      Uri.parse(Endpoint.checkOut),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'attendance_date': tanggal,
-        'check_out': jam,
-        'check_out_lat': _currentPosition.latitude,
-        'check_out_lng': _currentPosition.longitude,
-        'check_out_address': _currentAddress,
-      }),
+    bool isSuccess = await AbsenApiService.checkOut(
+      attendanceDate: tanggal,
+      checkOutTime: jam,
+      checkOutLat: _currentPosition.latitude,
+      checkOutLng: _currentPosition.longitude,
+      checkOutAddress: _currentAddress,
     );
 
-    if (response.statusCode == 200) {
+    if (isSuccess) {
       setState(() {
         checkOutTime = jam;
       });
@@ -308,28 +297,26 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           showDialog(
             context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text("Pilih Aksi"),
-                content: const Text("Silakan pilih aksi yang ingin dilakukan:"),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _checkIn();
-                    },
-                    child: const Text("Check In"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _checkOut();
-                    },
-                    child: const Text("Check Out"),
-                  ),
-                ],
-              );
-            },
+            builder: (context) => AlertDialog(
+              title: const Text("Pilih Aksi"),
+              content: const Text("Silakan pilih aksi yang ingin dilakukan:"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _navigateToCheckIn();
+                  },
+                  child: const Text("Check In"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _showCheckOutDialog();
+                  },
+                  child: const Text("Check Out"),
+                ),
+              ],
+            ),
           );
         },
         child: Image.asset('assets/images/presence.png', width: 32, height: 32),
