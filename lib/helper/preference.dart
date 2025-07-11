@@ -28,7 +28,38 @@ class PreferenceHandler {
     return prefs.getBool(_loginKey) ?? false;
   }
 
-  /// Logout (hapus token & status login)
+  /// ✅ Simpan Check In Time per user
+  static Future<void> saveCheckInTimeForUser(int userId, String time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('check_in_time_user_$userId', time);
+  }
+
+  /// ✅ Ambil Check In Time per user
+  static Future<String?> getCheckInTimeForUser(int userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('check_in_time_user_$userId');
+  }
+
+  /// ✅ Simpan Check Out Time per user
+  static Future<void> saveCheckOutTimeForUser(int userId, String time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('check_out_time_user_$userId', time);
+  }
+
+  /// ✅ Ambil Check Out Time per user
+  static Future<String?> getCheckOutTimeForUser(int userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('check_out_time_user_$userId');
+  }
+
+  /// Hapus semua data Check In & Out (kalau diperlukan)
+  static Future<void> clearCheckTimesForUser(int userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('check_in_time_user_$userId');
+    await prefs.remove('check_out_time_user_$userId');
+  }
+
+  /// Logout (hapus token & status login saja, data check in/out tetap aman)
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);

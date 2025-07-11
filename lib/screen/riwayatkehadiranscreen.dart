@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:projectakhir/api/user_api.dart';
+import 'package:projectakhir/api/absensi_service.dart';
 import 'package:projectakhir/model/historyabsen_model.dart';
 
-class RiwayatKehadiranScreen extends StatefulWidget {
-  const RiwayatKehadiranScreen({super.key});
+class HistoryAbsenScreen extends StatefulWidget {
+  const HistoryAbsenScreen({super.key});
 
   @override
-  State<RiwayatKehadiranScreen> createState() => _RiwayatKehadiranScreenState();
+  State<HistoryAbsenScreen> createState() => _HistoryAbsenScreenState();
 }
 
-class _RiwayatKehadiranScreenState extends State<RiwayatKehadiranScreen> {
-  late Future<HistoryAbsen?> _futureHistoryAbsen;
+class _HistoryAbsenScreenState extends State<HistoryAbsenScreen> {
+  late Future<List<Datum>?> _futureHistoryAbsen;
 
   @override
   void initState() {
     super.initState();
-    _futureHistoryAbsen = UserService.getHistoryAbsen();
+    _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
   }
 
   @override
@@ -37,7 +37,7 @@ class _RiwayatKehadiranScreenState extends State<RiwayatKehadiranScreen> {
         ),
       ),
       backgroundColor: Colors.grey[100],
-      body: FutureBuilder<HistoryAbsen?>(
+      body: FutureBuilder<List<Datum>?>(
         future: _futureHistoryAbsen,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -48,15 +48,15 @@ class _RiwayatKehadiranScreenState extends State<RiwayatKehadiranScreen> {
             return const Center(child: Text("Data tidak ditemukan"));
           } else {
             final history = snapshot.data!;
-            if (history.data == null || history.data!.isEmpty) {
+            if (history.isEmpty) {
               return const Center(child: Text("Belum ada data kehadiran."));
             }
 
             return ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: history.data!.length,
+              itemCount: history.length,
               itemBuilder: (context, index) {
-                final absen = history.data![index];
+                final absen = history[index];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(12),

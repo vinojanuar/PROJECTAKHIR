@@ -1,13 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:projectakhir/Gmaps/maps_page.dart';
-import 'package:projectakhir/screen/profilscreen.dart';
-import 'package:projectakhir/screen/checkin_screen.dart'; // Ubah nama file checkin_screen.dart sesuai nama aslimu
 import 'package:projectakhir/api/absensi_service.dart';
+import 'package:projectakhir/model/historyabsen_model.dart';
+import 'package:projectakhir/screen/checkin_screen.dart';
+import 'package:projectakhir/screen/profilscreen.dart';
+import 'package:projectakhir/screen/riwayatkehadiranscreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String checkOutTime = "-- : -- : --";
   LatLng _currentPosition = const LatLng(0.0, 0.0);
   String _currentAddress = "Belum Diketahui";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodayAttendance(); // Otomatis ambil dari API saat buka Home
+  }
 
   Future<void> _ambilLokasiDanAlamat() async {
     try {
@@ -121,6 +128,28 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Check Out Gagal")));
+    }
+  }
+
+  Future<void> _loadTodayAttendance() async {
+    try {
+      final history = await AbsenApiService.fetchHistoryAbsen();
+      final today = DateTime.now();
+
+      final todayAttendance = history?.firstWhere(
+        (absen) =>
+            absen.attendanceDate?.year == today.year &&
+            absen.attendanceDate?.month == today.month &&
+            absen.attendanceDate?.day == today.day,
+        orElse: () => Datum(),
+      );
+
+      setState(() {
+        checkInTime = todayAttendance?.checkInTime ?? "-- : -- : --";
+        checkOutTime = todayAttendance?.checkOutTime ?? "-- : -- : --";
+      });
+    } catch (e) {
+      print("Error ambil absen hari ini: $e");
     }
   }
 
@@ -286,6 +315,148 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "History Absen",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const HistoryAbsenScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text("Lihat Semua"),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        FutureBuilder<List<Datum>?>(
+                          future: AbsenApiService.fetchHistoryAbsen(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text("Error: ${snapshot.error}"),
+                              );
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Center(
+                                child: Text("Tidak ada history absen"),
+                              );
+                            } else {
+                              final history = snapshot.data!;
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: history.length > 3
+                                    ? 3
+                                    : history.length,
+                                itemBuilder: (context, index) {
+                                  final absen = history[index];
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              _getDayName(absen.attendanceDate),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              absen.attendanceDate != null
+                                                  ? "${absen.attendanceDate!.day.toString().padLeft(2, '0')}-${absen.attendanceDate!.month.toString().padLeft(2, '0')}-${absen.attendanceDate!.year}"
+                                                  : '-',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Spacer(),
+                                        Row(
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const Text("Check In"),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  absen.checkInTime ?? '-',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 24),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const Text("Check Out"),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  absen.checkOutTime ?? '-',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -356,5 +527,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  String _getDayName(DateTime? date) {
+    if (date == null) return '-';
+    final days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    return days[date.weekday % 7];
   }
 }
