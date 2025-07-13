@@ -1,12 +1,16 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:projectakhir/endpoint/endpoint.dart';
 import 'package:projectakhir/helper/preference.dart';
+import 'package:projectakhir/model/absenstatus_model.dart';
+import 'package:projectakhir/model/absentoday_model.dart';
 import 'package:projectakhir/model/checkin_model.dart';
 import 'package:projectakhir/model/historyabsen_model.dart';
+import 'package:projectakhir/model/izin_model.dart';
 
 class AbsenApiService {
+  // === CHECK IN ===
   static Future<CheckIn?> checkIn({
     required int userId,
     required String attendanceDate,
@@ -27,6 +31,7 @@ class AbsenApiService {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
+        'user_id': userId,
         'attendance_date': attendanceDate,
         'check_in': checkInTime,
         'check_in_lat': checkInLat,
@@ -44,6 +49,7 @@ class AbsenApiService {
     }
   }
 
+  // === CHECK OUT ===
   static Future<bool> checkOut({
     required String attendanceDate,
     required String checkOutTime,
@@ -68,14 +74,10 @@ class AbsenApiService {
       }),
     );
 
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    }
+    return response.statusCode == 200;
   }
 
-  // History Absen
+  // === HISTORY ABSEN ===
   static Future<List<Datum>?> fetchHistoryAbsen() async {
     final token = await PreferenceHandler.getToken();
 
@@ -89,6 +91,88 @@ class AbsenApiService {
       return historyAbsen.data;
     } else {
       return null;
+    }
+  }
+
+  // === ABSEN STATUS ===
+  static Future<AbsenStatus?> fetchAbsenStatus() async {
+    final token = await PreferenceHandler.getToken();
+    final url = Uri.parse("${Endpoint.baseUrlApi}/absen/stats");
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return absenStatusFromJson(response.body);
+    } else {
+      throw Exception("Gagal memuat status absen: ${response.statusCode}");
+    }
+  }
+
+  // === ABSEN TODAY ===
+  static Future<AbsenToday?> fetchAbsenToday() async {
+    final token = await PreferenceHandler.getToken();
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final url = Uri.parse(
+      "${Endpoint.baseUrlApi}/absen/today?attendance_date=$today",
+    );
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return absenTodayFromJson(response.body);
+    } else {
+      throw Exception("Gagal memuat absen hari ini");
+    }
+  }
+
+  // === POST IZIN ===
+  static Future<Izin?> postIzin({
+    required String date,
+    required String alasanIzin,
+  }) async {
+    final token = await PreferenceHandler.getToken();
+    final url = Uri.parse("https://appabsensi.mobileprojp.com/api/izin");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({"date": date, "alasan_izin": alasanIzin}),
+    );
+
+    if (response.statusCode == 200) {
+      return izinFromJson(response.body);
+    } else {
+      print("STATUS CODE: ${response.statusCode}");
+      print("BODY: ${response.body}");
+      throw Exception("Gagal mengirim data izin");
+    }
+  }
+
+  // === FETCH IZIN (GET IZIN TODAY) ===
+  static Future<Izin?> fetchIzinHariIni() async {
+    final token = await PreferenceHandler.getToken();
+
+    final url = Uri.parse("${Endpoint.baseUrlApi}/absen/izin");
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return izinFromJson(response.body);
+    } else {
+      throw Exception("Gagal memuat data izin hari ini");
     }
   }
 }

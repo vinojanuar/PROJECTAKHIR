@@ -13,10 +13,10 @@ class Loginscreen extends StatefulWidget {
 class _LoginscreenState extends State<Loginscreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final UserService userService = UserService();
+  final UserService userService =
+      UserService(); // Pastikan ini sudah diimplementasikan dengan benar
 
   bool isLoading = false;
-
   bool _obscureText = true;
 
   void login() async {
@@ -24,6 +24,7 @@ class _LoginscreenState extends State<Loginscreen> {
       isLoading = true;
     });
 
+    // Simulasi API call
     final res = await userService.loginUser(
       email: emailController.text,
       password: passwordController.text,
@@ -36,11 +37,9 @@ class _LoginscreenState extends State<Loginscreen> {
           backgroundColor: Colors.green,
         ),
       );
-
-      // Pindah ke halaman profile
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else if (res["errors"] != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,19 +58,21 @@ class _LoginscreenState extends State<Loginscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Latar belakang utama putih
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Header Hitam
           Container(
-            color: const Color(0xff84BFFF),
+            color: Colors.black, // Latar belakang hitam pekat
             height: 250,
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 24),
             child: const Text(
               "Presence App",
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+                color: Colors.white, // Teks putih
+                fontSize: 28, // Ukuran font lebih besar
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -85,69 +86,142 @@ class _LoginscreenState extends State<Loginscreen> {
                   const SizedBox(height: 24),
                   const Text(
                     "Log in",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    style: TextStyle(
+                      fontSize: 24, // Ukuran judul lebih besar
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black, // Teks hitam
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32), // Spasi lebih besar
+                  TextField(
+                    controller: emailController,
+                    style: const TextStyle(
+                      color: Colors.black,
+                    ), // Warna teks input
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      labelStyle: TextStyle(
+                        color: Colors.grey[700],
+                      ), // Warna label
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.black,
+                          width: 2,
+                        ), // Border saat aktif
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ), // Border lebih bulat
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey[400]!,
+                          width: 1,
+                        ), // Border saat tidak aktif
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ), // Padding dalam input
+                    ),
+                  ),
+                  const SizedBox(height: 20), // Spasi antar input
                   TextField(
                     controller: passwordController,
                     obscureText: _obscureText,
+                    style: const TextStyle(
+                      color: Colors.black,
+                    ), // Warna teks input
                     decoration: InputDecoration(
                       labelText: "Kata Sandi",
+                      labelStyle: TextStyle(color: Colors.grey[700]),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 2),
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey[400]!,
+                          width: 1,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                      ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureText
                               ? Icons.visibility_off
                               : Icons.visibility,
+                          color: Colors.grey[600], // Warna ikon
                         ),
                         onPressed: () {
                           setState(() {
-                            _obscureText = !_obscureText; // Toggle Show/Hide
+                            _obscureText = !_obscureText;
                           });
                         },
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32), // Spasi sebelum tombol
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade900,
+                        backgroundColor: Colors.black, // Tombol hitam
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Bentuk tombol lebih kotak
                         ),
+                        elevation: 0, // Tanpa shadow
                       ),
                       onPressed: isLoading ? null : login,
-                      child: const Text(
-                        "Log in",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white, // Indikator loading putih
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Log in",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.white, // Teks tombol putih
+                              ),
+                            ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Center(
-                    child: Text(
-                      "Lupa Kata Sandi?",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 20),
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        // TODO: Implementasi lupa kata sandi
+                      },
+                      child: const Text(
+                        "Lupa Kata Sandi?",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey, // Warna teks abu-abu
+                        ),
                       ),
                     ),
                   ),
@@ -160,11 +234,13 @@ class _LoginscreenState extends State<Loginscreen> {
                         children: [
                           const Text(
                             "Belum punya akun?",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black, // Teks hitam
+                            ),
                           ),
                           TextButton(
                             onPressed: () {
-                              // Pindah ke halaman Register
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -175,7 +251,7 @@ class _LoginscreenState extends State<Loginscreen> {
                             child: const Text(
                               "Register",
                               style: TextStyle(
-                                color: Color(0xff113289),
+                                color: Colors.black, // Teks "Register" hitam
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

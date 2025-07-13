@@ -5,6 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:projectakhir/api/absensi_service.dart';
 import 'package:projectakhir/model/checkin_model.dart';
+import 'package:projectakhir/screen/izin_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CheckinScreen extends StatefulWidget {
   const CheckinScreen({super.key});
@@ -18,13 +20,19 @@ class _CheckinScreenState extends State<CheckinScreen> {
   String _currentAddress = "Belum Diketahui";
   LatLng _currentPosition = const LatLng(-6.2, 106.8);
   late GoogleMapController _mapController;
+  int? _userId;
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userId = prefs.getInt('user_id');
+    });
+  }
 
   Future<void> _ambilLokasiDanAlamat() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        throw "GPS tidak aktif!";
-      }
+      if (!serviceEnabled) throw "GPS tidak aktif!";
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -52,7 +60,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
       Placemark place = placemarks.first;
       setState(() {
         _currentAddress =
-            "${place.street}, ${place.subLocality}, ${place.locality}";
+            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}";
       });
     } catch (e) {
       ScaffoldMessenger.of(
@@ -62,20 +70,27 @@ class _CheckinScreenState extends State<CheckinScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _ambilLokasiDanAlamat();
+    _loadUserId();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final String today = DateFormat('EEEE', 'id_ID').format(DateTime.now());
+    final String dateNow = DateFormat('dd-MMM-yy').format(DateTime.now());
+    final String jamNow = DateFormat('HH:mm:ss').format(DateTime.now());
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        backgroundColor: Colors.black, // AppBar hitam
         title: const Text(
           "Kehadiran",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+          style: TextStyle(color: Colors.white),
+        ), // Teks putih
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white), // Ikon putih
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -102,12 +117,13 @@ class _CheckinScreenState extends State<CheckinScreen> {
                     right: 16,
                     child: FloatingActionButton(
                       mini: true,
-                      backgroundColor: Colors.white,
+                      backgroundColor:
+                          Colors.black, // Floating action button hitam
                       onPressed: _ambilLokasiDanAlamat,
-                      child: Icon(
+                      child: const Icon(
                         Icons.my_location,
-                        color: Colors.blue.shade700,
-                      ),
+                        color: Colors.white,
+                      ), // Ikon putih
                     ),
                   ),
                 ],
@@ -122,15 +138,15 @@ class _CheckinScreenState extends State<CheckinScreen> {
                     children: [
                       const Text(
                         "Status:",
-                        style: TextStyle(fontSize: 16, color: Colors.black54),
-                      ),
+                        style: TextStyle(fontSize: 16, color: Colors.black87),
+                      ), // Teks hitam keabuan
                       const SizedBox(width: 8),
                       Text(
                         _statusCheckIn,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.orange,
+                          color: Colors.orange, // Tetap orange untuk status
                         ),
                       ),
                     ],
@@ -141,49 +157,154 @@ class _CheckinScreenState extends State<CheckinScreen> {
                     children: [
                       const Text(
                         "Alamat:",
-                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                        style: TextStyle(fontSize: 16, color: Colors.black87),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _currentAddress,
-                          style: const TextStyle(fontSize: 16),
+                          style: const TextStyle(color: Colors.black),
                         ),
-                      ),
+                      ), // Teks hitam
                     ],
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _ambilLokasiDanAlamat();
-                      String tanggalHariIni = DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(DateTime.now());
-                      String jamSekarang = DateFormat(
-                        'HH:mm',
-                      ).format(DateTime.now());
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white, // Background putih
+                      border: Border.all(color: Colors.black), // Border hitam
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              today,
+                              style: const TextStyle(color: Colors.black87),
+                            ), // Teks abu-abu
+                            const SizedBox(height: 4),
+                            Text(
+                              dateNow,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 21,
+                                color: Colors.black, // Teks hitam
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Jam",
+                              style: TextStyle(color: Colors.black87),
+                            ), // Teks abu-abu
+                            const SizedBox(height: 4),
+                            Text(
+                              jamNow,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 21,
+                                color: Colors.black, // Teks hitam
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await _ambilLokasiDanAlamat();
+                            final checkinTime = DateFormat(
+                              'HH:mm',
+                            ).format(DateTime.now());
+                            final checkinDate = DateFormat(
+                              'yyyy-MM-dd',
+                            ).format(DateTime.now());
 
-                      CheckIn? hasil = await AbsenApiService.checkIn(
-                        userId: 1,
-                        attendanceDate: tanggalHariIni,
-                        checkInTime: jamSekarang,
-                        checkInLocation: "Lokasi GPS",
-                        checkInAddress: _currentAddress,
-                        checkInLat: _currentPosition.latitude,
-                        checkInLng: _currentPosition.longitude,
-                        status: 'masuk',
-                        alasanIzin: null,
-                      );
+                            final CheckIn? response =
+                                await AbsenApiService.checkIn(
+                                  userId: _userId!,
+                                  attendanceDate: checkinDate,
+                                  checkInTime: checkinTime,
+                                  checkInLat: _currentPosition.latitude,
+                                  checkInLng: _currentPosition.longitude,
+                                  checkInAddress: _currentAddress,
+                                  checkInLocation: _currentAddress,
+                                  status: "hadir",
+                                );
 
-                      if (hasil != null) {
-                        Navigator.pop(context, hasil.data?.checkInTime);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Check In Gagal")),
-                        );
-                      }
-                    },
-                    child: const Text("Check In"),
+                            if (response != null &&
+                                response.message == "Success") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Check In Berhasil"),
+                                ),
+                              );
+                              Navigator.pop(context, checkinTime);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    response?.message ?? "Check In Gagal",
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black, // Tombol hitam
+                            foregroundColor: Colors.white, // Teks tombol putih
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "Check In",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const IzinScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white, // Tombol putih
+                            foregroundColor: Colors.black, // Teks tombol hitam
+                            side: const BorderSide(
+                              color: Colors.black,
+                            ), // Border hitam
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "Izin",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

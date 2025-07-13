@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:projectakhir/endpoint/endpoint.dart';
 import 'package:projectakhir/helper/preference.dart';
@@ -49,15 +51,17 @@ class UserService {
   }) async {
     final response = await http.post(
       Uri.parse(Endpoint.login),
-      headers: {"Accept": "application/json"},
-      body: {"email": email, "password": password},
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json", // WAJIB
+      },
+      body: jsonEncode({"email": email, "password": password}),
     );
 
     print(response.body);
     print(response.statusCode);
 
     if (response.statusCode == 200) {
-      // Simpan Token ke Preference
       final registerData = registerFromJson(response.body);
       if (registerData.data?.token != null) {
         await PreferenceHandler.saveToken(registerData.data!.token!);
@@ -67,7 +71,6 @@ class UserService {
     } else if (response.statusCode == 422) {
       return registerGagalFromJson(response.body).toJson();
     } else {
-      print("Failed to login user: ${response.statusCode}");
       throw Exception("Failed to login user: ${response.statusCode}");
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -5,7 +7,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:projectakhir/Gmaps/maps_page.dart';
 import 'package:projectakhir/api/absensi_service.dart';
+import 'package:projectakhir/api/profile_service.dart';
 import 'package:projectakhir/model/historyabsen_model.dart';
+import 'package:projectakhir/model/profile_model.dart';
 import 'package:projectakhir/screen/checkin_screen.dart';
 import 'package:projectakhir/screen/profilscreen.dart';
 import 'package:projectakhir/screen/riwayatkehadiranscreen.dart';
@@ -22,11 +26,36 @@ class _HomeScreenState extends State<HomeScreen> {
   String checkOutTime = "-- : -- : --";
   LatLng _currentPosition = const LatLng(0.0, 0.0);
   String _currentAddress = "Belum Diketahui";
+  late String _currentDate;
+  late String _currentTime;
+  late Timer _timer;
+  late Future<List<Datum>?> _futureHistoryAbsen;
+  late Future<Profile?> _futureProfile; // Tambah Future Profile
 
   @override
   void initState() {
     super.initState();
-    _loadTodayAttendance(); // Otomatis ambil dari API saat buka Home
+
+    _currentDate = DateFormat('EEEE, d MMMM y', 'id_ID').format(DateTime.now());
+    _currentTime = DateFormat('HH:mm:ss').format(DateTime.now());
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final now = DateTime.now();
+      setState(() {
+        _currentTime = DateFormat('HH:mm:ss').format(now);
+        _currentDate = DateFormat('EEEE, d MMMM y', 'id_ID').format(now);
+      });
+    });
+
+    _loadTodayAttendance();
+    _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
+    _futureProfile = ProfileApiService.fetchProfile();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   Future<void> _ambilLokasiDanAlamat() async {
@@ -84,18 +113,28 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Konfirmasi Check Out"),
-        content: const Text("Apakah Anda yakin ingin Check Out sekarang?"),
+        title: const Text(
+          "Konfirmasi Check Out",
+          style: TextStyle(color: Colors.black),
+        ),
+        content: const Text(
+          "Apakah Anda yakin ingin Check Out sekarang?",
+          style: TextStyle(color: Colors.black87),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Batal"),
+            child: const Text("Batal", style: TextStyle(color: Colors.black)),
           ),
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
               await _performCheckOut();
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black, // Ubah warna tombol
+              foregroundColor: Colors.white, // Ubah warna teks tombol
+            ),
             child: const Text("Check Out"),
           ),
         ],
@@ -120,6 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (isSuccess) {
       setState(() {
         checkOutTime = jam;
+        _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
       });
       ScaffoldMessenger.of(
         context,
@@ -156,8 +196,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(backgroundColor: Colors.white, elevation: 0),
+      backgroundColor: Colors.white, // Latar belakang putih
+      appBar: AppBar(
+        backgroundColor: Colors.black, // AppBar hitam
+        elevation: 0,
+        title: const Text(
+          "Home",
+          style: TextStyle(color: Colors.white),
+        ), // Tambah judul
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -165,54 +213,112 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Colors.black, // Kartu utama hitam
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.blue,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Semangat Pagi",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                  FutureBuilder<Profile?>(
+                    future: _futureProfile,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Row(
+                          children: const [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white, // Avatar putih
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.black,
+                              ), // Ikon hitam
                             ),
-                          ),
-                          SizedBox(height: 4),
-                          Text("Muhammad Rio Akbar"),
-                          Text("123456789"),
-                        ],
-                      ),
-                    ],
+                            SizedBox(width: 12),
+                            Text(
+                              "Memuat...",
+                              style: TextStyle(color: Colors.white),
+                            ), // Teks putih
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        return Row(
+                          children: const [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              child: Icon(Icons.person, color: Colors.black),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              "Gagal memuat profil",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        );
+                      } else {
+                        final profile = snapshot.data!;
+                        return Row(
+                          children: [
+                            const CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.white,
+                              child: Icon(Icons.person, color: Colors.black),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Semangat Pagi",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.white, // Teks putih
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  profile.data?.name ?? "-",
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                  ), // Teks putih keabuan
+                                ),
+                                Text(
+                                  profile.data?.email ?? "-",
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                  ), // Teks putih keabuan
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+                    },
                   ),
+
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xff84BFFF),
+                      color: Colors.white, // Bagian waktu putih
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       children: [
-                        const Text(
-                          "Jl. Pangeran Diponegoro No. 5, Kec. Medan Petisah, Kota Medan, Sumatera Utara",
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        Text(
+                          "$_currentDate • $_currentTime",
+                          style: const TextStyle(
+                            color: Colors.black, // Teks hitam
+                            fontSize: 14,
+                          ),
                         ),
+
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 119, 165, 243),
+                            color: Colors
+                                .black87, // Bagian check in/out hitam keabuan
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -225,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: Colors.white,
+                                      color: Colors.white, // Teks putih
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -234,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 19,
-                                      color: Colors.white,
+                                      color: Colors.white, // Teks putih
                                     ),
                                   ),
                                 ],
@@ -242,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Container(
                                 width: 2,
                                 height: 70,
-                                color: Colors.white,
+                                color: Colors.white, // Pemisah putih
                               ),
                               Column(
                                 children: [
@@ -251,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: Colors.white,
+                                      color: Colors.white, // Teks putih
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -260,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 19,
-                                      color: Colors.white,
+                                      color: Colors.white, // Teks putih
                                     ),
                                   ),
                                 ],
@@ -275,8 +381,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: Colors.white, // Background putih
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.black26,
+                      ), // Border abu-abu muda
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -284,20 +393,32 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: const [
-                            Text("Distance from place"),
+                            Text(
+                              "Jarak dari lokasi",
+                              style: TextStyle(color: Colors.black54),
+                            ), // Teks abu-abu
                             SizedBox(height: 4),
                             Text(
-                              "250.43m",
+                              "250.43m", // Nilai ini mungkin perlu diperbarui secara dinamis
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 21,
+                                color: Colors.black, // Teks hitam
                               ),
                             ),
                           ],
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade900,
+                            backgroundColor: Colors.black, // Tombol hitam
+                            foregroundColor: Colors.white, // Teks tombol putih
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           onPressed: () {
                             Navigator.push(
@@ -308,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           child: const Text(
-                            "Open Maps",
+                            "Buka Peta",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -319,8 +440,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.white, // Background putih
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.black26,
+                      ), // Border abu-abu muda
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,10 +453,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              "History Absen",
+                              "Riwayat Absen",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
+                                color: Colors.black, // Teks hitam
                               ),
                             ),
                             TextButton(
@@ -345,27 +470,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 );
                               },
-                              child: const Text("Lihat Semua"),
+                              child: const Text(
+                                "Lihat Semua",
+                                style: TextStyle(color: Colors.black),
+                              ), // Teks hitam
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         FutureBuilder<List<Datum>?>(
-                          future: AbsenApiService.fetchHistoryAbsen(),
+                          future: _futureHistoryAbsen,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const Center(
-                                child: CircularProgressIndicator(),
+                                child: CircularProgressIndicator(
+                                  color: Colors.black,
+                                ), // Indikator hitam
                               );
                             } else if (snapshot.hasError) {
                               return Center(
-                                child: Text("Error: ${snapshot.error}"),
+                                child: Text(
+                                  "Error: ${snapshot.error}",
+                                  style: const TextStyle(color: Colors.black87),
+                                ),
                               );
                             } else if (!snapshot.hasData ||
                                 snapshot.data!.isEmpty) {
                               return const Center(
-                                child: Text("Tidak ada history absen"),
+                                child: Text(
+                                  "Tidak ada riwayat absen",
+                                  style: TextStyle(color: Colors.black87),
+                                ),
                               );
                             } else {
                               final history = snapshot.data!;
@@ -381,10 +517,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     margin: const EdgeInsets.only(bottom: 12),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: Colors
+                                          .grey[50], // Background item riwayat abu-abu sangat muda
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: Colors.grey.shade300,
+                                        color: Colors
+                                            .black12, // Border sangat tipis
                                       ),
                                     ),
                                     child: Row(
@@ -399,6 +537,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               _getDayName(absen.attendanceDate),
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
+                                                color:
+                                                    Colors.black, // Teks hitam
                                               ),
                                             ),
                                             const SizedBox(height: 4),
@@ -408,44 +548,90 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   : '-',
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
+                                                color: Colors
+                                                    .black87, // Teks hitam keabuan
                                               ),
                                             ),
                                           ],
                                         ),
                                         const Spacer(),
-                                        Row(
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                const Text("Check In"),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  absen.checkInTime ?? '-',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
+
+                                        absen.status?.toLowerCase() == 'izin'
+                                            ? Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text(
+                                                    "Status: Izin",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors
+                                                          .orange, // Tetap gunakan orange untuk status Izin
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(width: 24),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                const Text("Check Out"),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  absen.checkOutTime ?? '-',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    "Alasan: ${absen.alasanIzin ?? '-'}",
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                                                ],
+                                              )
+                                            : Row(
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      const Text(
+                                                        "Check In",
+                                                        style: TextStyle(
+                                                          color: Colors.black54,
+                                                        ),
+                                                      ), // Teks abu-abu
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        absen.checkInTime ??
+                                                            '-',
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors
+                                                              .black, // Teks hitam
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(width: 24),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      const Text(
+                                                        "Check Out",
+                                                        style: TextStyle(
+                                                          color: Colors.black54,
+                                                        ),
+                                                      ), // Teks abu-abu
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        absen.checkOutTime ??
+                                                            '-',
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors
+                                                              .black, // Teks hitam
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                       ],
                                     ),
                                   );
@@ -464,36 +650,54 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue[300],
+        backgroundColor: Colors.black, // Floating action button hitam
         onPressed: () {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text("Pilih Aksi"),
-              content: const Text("Silakan pilih aksi yang ingin dilakukan:"),
+              title: const Text(
+                "Pilih Aksi",
+                style: TextStyle(color: Colors.black),
+              ),
+              content: const Text(
+                "Silakan pilih aksi yang ingin dilakukan:",
+                style: TextStyle(color: Colors.black87),
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                     _navigateToCheckIn();
                   },
-                  child: const Text("Check In"),
+                  child: const Text(
+                    "Check In",
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                     _showCheckOutDialog();
                   },
-                  child: const Text("Check Out"),
+                  child: const Text(
+                    "Check Out",
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ),
               ],
             ),
           );
         },
-        child: Image.asset('assets/images/presence.png', width: 32, height: 32),
+        child: Image.asset(
+          'assets/images/presence.png',
+          width: 32,
+          height: 32,
+          color: Colors.white,
+        ), // Ubah warna ikon jika perlu
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
+        color: Colors.black, // BottomAppBar hitam
         shape: const CircularNotchedRectangle(),
         notchMargin: 5,
         child: Row(
@@ -504,6 +708,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'assets/images/home.png',
                 width: 24,
                 height: 24,
+                color: Colors.white, // Ikon putih
               ),
               onPressed: () {},
             ),
@@ -513,6 +718,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'assets/images/user.png',
                 width: 24,
                 height: 24,
+                color: Colors.white, // Ikon putih
               ),
               onPressed: () {
                 Navigator.push(
@@ -532,13 +738,13 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getDayName(DateTime? date) {
     if (date == null) return '-';
     final days = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
     ];
     return days[date.weekday % 7];
   }
