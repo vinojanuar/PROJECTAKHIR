@@ -13,5 +13,5 @@ class Endpoint {
   static const String absenStatus = "$baseUrlApi/absen/stats";
   static const String Izin = "$baseUrlApi/izin";
   static const String profile = "$baseUrlApi/profile";
-  static const String addPhoto = "$profile/photo";
+  static const String addPhoto = "$baseUrlApi/profile/photo";
 }

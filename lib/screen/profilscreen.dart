@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:projectakhir/api/absensi_service.dart';
 import 'package:projectakhir/api/profile_service.dart';
+import 'package:projectakhir/endpoint/endpoint.dart';
 import 'package:projectakhir/helper/preference.dart';
 import 'package:projectakhir/model/absenstatus_model.dart';
 import 'package:projectakhir/model/absentoday_model.dart';
@@ -203,15 +204,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     child: CircleAvatar(
                       radius: 60,
-                      backgroundColor: Colors.grey[800],
+                      backgroundColor: Colors.grey[200],
                       backgroundImage:
-                          profile.data?.profilePhoto != null &&
-                              profile.data!.profilePhoto!.isNotEmpty
-                          ? NetworkImage(profile.data!.profilePhoto!)
-                          : const AssetImage(
-                                  'assets/images/default_profile.png',
-                                )
-                                as ImageProvider,
+                          (profile.data?.profilePhoto != null &&
+                              profile.data!.profilePhoto!.isNotEmpty)
+                          ? NetworkImage(
+                              "${Endpoint.baseUrl}/${profile.data!.profilePhoto!}",
+                            )
+                          : null,
+                      child:
+                          (profile.data?.profilePhoto == null ||
+                              profile.data!.profilePhoto!.isEmpty)
+                          ? const Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.grey,
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -580,33 +589,6 @@ class _ProfileScreenState extends State<ProfileScreen>
               title: "Edit Profil",
               subtitle: "Perbarui data pribadi",
               color: Colors.black,
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditProfileScreen(
-                      initialName: profile.data?.name ?? '',
-                      initialEmail: profile.data?.email ?? '',
-                      initialGender: profile.data?.jenisKelamin ?? '',
-                      initialBatchId: profile.data?.batch?.id?.toString() ?? '',
-                      initialTrainingId:
-                          profile.data?.training?.id?.toString() ?? '',
-                    ),
-                  ),
-                );
-                if (result == true) {
-                  setState(() {
-                    _futureProfile = ProfileApiService.getProfile();
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildModernMenuItem(
-              icon: Icons.image_outlined,
-              title: "Edit Foto Profil",
-              subtitle: "Ganti foto profil kamu",
-              color: Colors.grey[700]!,
               onTap: () async {
                 final result = await Navigator.push(
                   context,
