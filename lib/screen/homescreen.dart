@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _loadTodayAttendance();
     _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
-    _futureProfile = ProfileApiService.fetchProfile();
+    _futureProfile = ProfileApiService.getProfile();
   }
 
   @override
@@ -157,8 +157,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (isSuccess) {
+      await _loadTodayAttendance();
       setState(() {
-        checkOutTime = jam;
         _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
       });
       ScaffoldMessenger.of(

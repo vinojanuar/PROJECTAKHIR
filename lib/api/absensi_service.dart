@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:projectakhir/endpoint/endpoint.dart';
@@ -12,13 +13,11 @@ import 'package:projectakhir/model/izin_model.dart';
 class AbsenApiService {
   // === CHECK IN ===
   static Future<CheckIn?> checkIn({
-    required int userId,
     required String attendanceDate,
     required String checkInTime,
-    required String checkInLocation,
-    required String checkInAddress,
     required double checkInLat,
     required double checkInLng,
+    required String checkInAddress,
     required String status,
     String? alasanIzin,
   }) async {
@@ -28,10 +27,10 @@ class AbsenApiService {
       Uri.parse('${Endpoint.baseUrl}/api/absen/check-in'),
       headers: {
         'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'user_id': userId,
         'attendance_date': attendanceDate,
         'check_in': checkInTime,
         'check_in_lat': checkInLat,

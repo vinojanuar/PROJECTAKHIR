@@ -24,9 +24,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
 
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _userId = prefs.getInt('user_id');
-    });
+    setState(() {});
   }
 
   Future<void> _ambilLokasiDanAlamat() async {
@@ -73,7 +71,6 @@ class _CheckinScreenState extends State<CheckinScreen> {
   void initState() {
     super.initState();
     _ambilLokasiDanAlamat();
-    _loadUserId();
   }
 
   @override
@@ -234,18 +231,16 @@ class _CheckinScreenState extends State<CheckinScreen> {
 
                             final CheckIn? response =
                                 await AbsenApiService.checkIn(
-                                  userId: _userId!,
                                   attendanceDate: checkinDate,
                                   checkInTime: checkinTime,
                                   checkInLat: _currentPosition.latitude,
                                   checkInLng: _currentPosition.longitude,
                                   checkInAddress: _currentAddress,
-                                  checkInLocation: _currentAddress,
-                                  status: "hadir",
+                                  status: "masuk",
                                 );
 
                             if (response != null &&
-                                response.message == "Success") {
+                                response.message == "Absen masuk berhasil") {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Check In Berhasil"),

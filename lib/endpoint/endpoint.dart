@@ -12,5 +12,6 @@ class Endpoint {
       "$baseUrlApi/absen/today?attendance_date=$date";
   static const String absenStatus = "$baseUrlApi/absen/stats";
   static const String Izin = "$baseUrlApi/izin";
-  static const String editProfile = "$baseUrlApi/profile";
+  static const String profile = "$baseUrlApi/profile";
+  static const String addPhoto = "$profile/photo";
 }

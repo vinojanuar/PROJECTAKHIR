@@ -1,25 +1,28 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
+import 'package:projectakhir/endpoint/endpoint.dart';
+import 'package:projectakhir/helper/preference.dart';
 import 'package:projectakhir/model/editfoto_model.dart';
 import 'package:projectakhir/model/editprofile_model.dart';
 import 'package:projectakhir/model/profile_model.dart';
-import 'package:projectakhir/helper/preference.dart';
-import 'package:projectakhir/endpoint/endpoint.dart';
 
 class ProfileApiService {
-  static Future<Profile?> fetchProfile() async {
-    final token = await PreferenceHandler.getToken();
-
+  static Future<Profile> getProfile() async {
+    String? token = await PreferenceHandler.getToken();
     final response = await http.get(
-      Uri.parse('${Endpoint.baseUrl}/api/profile'), // Ganti sesuai API kamu
-      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+      Uri.parse(Endpoint.profile),
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
+    print(response.body);
 
     if (response.statusCode == 200) {
+      print(profileFromJson(response.body));
       return profileFromJson(response.body);
     } else {
-      return null;
+      print('${response.statusCode}');
+      throw Exception("${response.statusCode}");
     }
   }
 
@@ -33,7 +36,7 @@ class ProfileApiService {
     final token = await PreferenceHandler.getToken();
 
     final response = await http.put(
-      Uri.parse(Endpoint.editProfile),
+      Uri.parse(Endpoint.profile),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -55,30 +58,29 @@ class ProfileApiService {
     }
   }
 
-  static Future<EditFoto> uploadProfilePhoto(File file) async {
-    final token = await PreferenceHandler.getToken();
-    final uri = Uri.parse(
-      'https://appabsensi.mobileprojp.com/api/profile/photo',
+  static Future<EditFoto> uploadProfilePhoto({
+    required String token,
+    required File photoFile,
+  }) async {
+    final url = Uri.parse(Endpoint.addPhoto);
+    final bytes = await photoFile.readAsBytes();
+    final base64Image = base64Encode(bytes);
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'profile_photo': base64Image}),
     );
-
-    final request = http.MultipartRequest('POST', uri)
-      ..headers['Accept'] = 'application/json'
-      ..headers['Authorization'] = 'Bearer $token'
-      ..files.add(
-        await http.MultipartFile.fromPath('profile_photo', file.path),
-      );
-
-    final response = await request.send();
-    final resStr = await response.stream.bytesToString(); // Tangkap isi respons
-
+    print('Upload photo status: \\${response.statusCode}');
+    print('Upload photo body: \\${response.body}');
     if (response.statusCode == 200) {
-      return editFotoFromJson(resStr); // Sesuai model
+      final jsonBody = json.decode(response.body);
+      return editFotoFromJson(jsonBody);
     } else {
-      // Tambahkan debug log atau lempar pesan lebih informatif
-      print("Gagal upload foto profil - status: ${response.statusCode}");
-      print("Isi respons: $resStr");
-
-      throw Exception("Gagal upload foto profil: $resStr");
+      throw Exception('Failed to upload profile photo: ${response.body}');
     }
   }
 }

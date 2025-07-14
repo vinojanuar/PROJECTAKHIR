@@ -33,37 +33,28 @@ class _RegisscreenState extends State<Regisscreen> {
   }
 
   Future<void> fetchBatchAndTraining() async {
-    // Simulasi pengambilan data batch dan training
-    await Future.delayed(const Duration(seconds: 1)); // Delay simulasi API
-    setState(() {
-      batchList = [
-        {'id': 1, 'batch_ke': 'Batch 1'},
-        {'id': 2, 'batch_ke': 'Batch 2'},
-        {'id': 3, 'batch_ke': 'Batch 3'},
-      ];
-      trainingList = [
-        {'id': 101, 'title': 'Flutter Fundamental'},
-        {'id': 102, 'title': 'Dart Advanced'},
-        {'id': 103, 'title': 'UI/UX Design for Mobile'},
-      ];
-    });
-    // try {
-    //   final batchData = await userService.getListBatch();
-    //   final trainingData = await userService.getListTraining();
+    try {
+      final batchData = await userService.getListBatch();
+      final trainingData = await userService.getListTraining();
 
-    //   setState(() {
-    //     batchList = batchData['data'] ?? [];
-    //     trainingList = trainingData['data'] ?? [];
-    //   });
-    // } catch (e) {
-    //   print("Error fetching batch/training data: $e");
-    // }
+      setState(() {
+        batchList = batchData['data'] ?? [];
+        trainingList = trainingData['data'] ?? [];
+      });
+    } catch (e) {
+      print("Error fetching batch/training data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal memuat data batch/training: $e")),
+      );
+    }
   }
 
   void register() async {
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty ||
+    if ([
+          nameController.text,
+          emailController.text,
+          passwordController.text,
+        ].any((element) => element.trim().isEmpty) ||
         selectedBatchId == null ||
         selectedTrainingId == null) {
       ScaffoldMessenger.of(
@@ -97,10 +88,19 @@ class _RegisscreenState extends State<Regisscreen> {
         context,
         MaterialPageRoute(builder: (context) => const Loginscreen()),
       );
+    } else if (res["errors"] != null && res["errors"]["email"] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Email sudah digunakan: ${res["errors"]["email"][0]}"),
+          backgroundColor: Colors.red,
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Maaf, ${res["message"] ?? "Terjadi kesalahan"}"),
+          content: Text(
+            "Gagal register: ${res["message"] ?? "Terjadi kesalahan"}",
+          ),
           backgroundColor: Colors.red,
         ),
       );

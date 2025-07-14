@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projectakhir/api/profile_service.dart';
+import 'package:projectakhir/helper/preference.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String initialName;
@@ -11,13 +13,13 @@ class EditProfileScreen extends StatefulWidget {
   final String initialGender;
 
   const EditProfileScreen({
-    Key? key,
+    super.key,
     required this.initialName,
     required this.initialEmail,
     required this.initialBatchId,
     required this.initialTrainingId,
     required this.initialGender,
-  }) : super(key: key);
+  });
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -27,15 +29,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _emailController;
-  String _selectedGender = 'L'; // Default to L if not provided
-  String _selectedBatchId = '1'; // Default value if not provided
-  String _selectedTrainingId = '1'; // Default value if not provided
+  bool isUploadingPhoto = false;
+  String _selectedGender = 'L';
+  String _selectedBatchId = '1';
+  String _selectedTrainingId = '1';
 
-  bool _isLoading = false;
+  final bool _isLoading = false;
   File? _selectedImage;
 
-  // Anda perlu menyediakan daftar batch dan training yang sebenarnya dari API
-  // Untuk tujuan styling, saya akan menggunakan daftar dummy.
   final List<Map<String, dynamic>> _batchOptions = [
     {'id': '1', 'name': 'Batch A'},
     {'id': '2', 'name': 'Batch B'},
@@ -53,71 +54,73 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
     _emailController = TextEditingController(text: widget.initialEmail);
-
-    // Pastikan initial ID yang diterima ada di dalam list options
-    _selectedBatchId =
-        _batchOptions.any((batch) => batch['id'] == widget.initialBatchId)
-        ? widget.initialBatchId
-        : _batchOptions.first['id']; // Fallback to first if not found
-
-    _selectedTrainingId =
-        _trainingOptions.any(
-          (training) => training['id'] == widget.initialTrainingId,
-        )
-        ? widget.initialTrainingId
-        : _trainingOptions.first['id']; // Fallback to first if not found
-
+    _selectedBatchId = widget.initialBatchId;
+    _selectedTrainingId = widget.initialTrainingId;
     _selectedGender = widget.initialGender;
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-
-    if (picked != null) {
-      setState(() {
-        _selectedImage = File(picked.path);
-      });
-    }
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
-
+  Future<void> _pickAndUploadPhoto() async {
     try {
-      final result = await ProfileApiService.editProfile(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        jenisKelamin: _selectedGender,
-        batchId: _selectedBatchId,
-        trainingId: _selectedTrainingId,
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return;
+
+      File file = File(pickedFile.path);
+      String? token = await PreferenceHandler.getToken();
+
+      await ProfileApiService.uploadProfilePhoto(
+        token: token!,
+        photoFile: file,
       );
 
-      if (_selectedImage != null) {
-        // Asumsi uploadProfilePhoto menerima File
-        await ProfileApiService.uploadProfilePhoto(_selectedImage!);
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.message ?? "Profil berhasil diperbarui"),
-          backgroundColor: Colors.green, // Snack bar hijau untuk sukses
-        ),
-      );
-
-      Navigator.pop(context, true);
+      setState(() {
+        isUploadingPhoto = false;
+      });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Gagal memperbarui profil: ${e.toString()}"),
-          backgroundColor: Colors.red, // Snack bar merah untuk error
-        ),
-      );
-    } finally {
-      setState(() => _isLoading = false);
+      setState(() {
+        isUploadingPhoto = false;
+      });
+
+      print("Upload error: $e");
     }
   }
+
+  // Future<void> _submit() async {
+  //   if (!_formKey.currentState!.validate()) return;
+  //   setState(() => _isLoading = true);
+
+  //   try {
+  //     final result = await ProfileApiService.editProfile(
+  //       name: _nameController.text.trim(),
+  //       email: widget.initialEmail,
+  //       jenisKelamin: widget.initialGender,
+  //       batchId: widget.initialBatchId,
+  //       trainingId: widget.initialTrainingId,
+  //     );
+
+  //     if (_selectedImage != null) {
+  //       await ProfileApiService.uploadProfilePhoto(_selectedImage!);
+  //     }
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(result.message ?? "Profil berhasil diperbarui"),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
+
+  //     Navigator.pop(context, true);
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Gagal memperbarui profil: $e"),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   } finally {
+  //     setState(() => _isLoading = false);
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -129,14 +132,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Latar belakang putih
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black, // AppBar hitam
-        title: const Text(
-          "Edit Profil",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ), // Teks putih
-        iconTheme: const IconThemeData(color: Colors.white), // Ikon putih
+        backgroundColor: Colors.black,
+        title: const Text("Edit Profil", style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -148,40 +148,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 alignment: Alignment.bottomRight,
                 children: [
                   CircleAvatar(
-                    radius: 60, // Ukuran avatar sedikit lebih besar
-                    backgroundColor:
-                        Colors.grey[200], // Background abu-abu muda
+                    radius: 60,
+                    backgroundColor: Colors.grey[200],
                     backgroundImage: _selectedImage != null
                         ? FileImage(_selectedImage!)
-                        : const AssetImage('assets/images/default_profile.png')
+                        : const AssetImage(
+                                'assets/images/raflii_1752466740.png',
+                              )
                               as ImageProvider,
-                    child:
-                        _selectedImage ==
-                            null // Fallback if no image path provided
+                    child: _selectedImage == null
                         ? const Icon(Icons.person, size: 60, color: Colors.grey)
                         : null,
                   ),
                   Positioned(
-                    // Posisi tombol edit
                     right: 0,
                     bottom: 0,
                     child: CircleAvatar(
-                      // Circle around the icon button
                       radius: 20,
-                      backgroundColor: Colors.black, // Background hitam
+                      backgroundColor: Colors.black,
                       child: IconButton(
                         icon: const Icon(
                           Icons.edit,
-                          size: 20,
                           color: Colors.white,
-                        ), // Ikon putih
-                        onPressed: _pickImage,
+                          size: 20,
+                        ),
+                        onPressed: _pickAndUploadPhoto,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 32), // Spasi lebih besar
+              const SizedBox(height: 32),
               _buildTextFormField(
                 controller: _nameController,
                 labelText: 'Nama Lengkap',
@@ -189,78 +186,69 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     value!.isEmpty ? 'Nama tidak boleh kosong' : null,
               ),
               const SizedBox(height: 16),
-              _buildTextFormField(
+              TextFormField(
                 controller: _emailController,
-                labelText: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) =>
-                    value!.isEmpty ? 'Email tidak boleh kosong' : null,
+                enabled: false,
+                style: const TextStyle(color: Colors.black),
+                decoration: _disabledDecoration(labelText: 'Email'),
               ),
               const SizedBox(height: 16),
-              _buildDropdownFormField<String>(
+              DropdownButtonFormField<String>(
                 value: _selectedGender,
-                labelText: 'Jenis Kelamin',
                 items: const [
                   DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
                   DropdownMenuItem(value: 'P', child: Text('Perempuan')),
                 ],
-                onChanged: (value) => setState(() => _selectedGender = value!),
+                onChanged: null,
+                decoration: _disabledDecoration(labelText: 'Jenis Kelamin'),
               ),
               const SizedBox(height: 16),
-              // Contoh Dropdown untuk Batch (Anda harus mengisi `items` dari data API nyata)
-              _buildDropdownFormField<String>(
+              DropdownButtonFormField<String>(
                 value: _selectedBatchId,
-                labelText: 'Batch',
                 items: _batchOptions.map((batch) {
                   return DropdownMenuItem<String>(
-                    value: batch['id'],
+                    value: batch['id'].toString(), // ⬅️ konversi ke String
                     child: Text(batch['name']),
                   );
                 }).toList(),
-                onChanged: (value) => setState(() => _selectedBatchId = value!),
+                onChanged: null,
+                decoration: _disabledDecoration(labelText: 'Batch'),
               ),
+
               const SizedBox(height: 16),
-              // Contoh Dropdown untuk Training (Anda harus mengisi `items` dari data API nyata)
-              _buildDropdownFormField<String>(
+              DropdownButtonFormField<String>(
                 value: _selectedTrainingId,
-                labelText: 'Training',
                 items: _trainingOptions.map((training) {
                   return DropdownMenuItem<String>(
-                    value: training['id'],
+                    value: training['id'].toString(), // ⬅️ konversi ke String
                     child: Text(training['name']),
                   );
                 }).toList(),
-                onChanged: (value) =>
-                    setState(() => _selectedTrainingId = value!),
+                onChanged: null,
+                decoration: _disabledDecoration(labelText: 'Training'),
               ),
+
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submit,
+                  onPressed: _isLoading ? null : _pickAndUploadPhoto,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black, // Background hitam
-                    foregroundColor: Colors.white, // Text putih
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
                         )
                       : const Text(
                           "Simpan Perubahan",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(fontSize: 18),
                         ),
                 ),
               ),
@@ -271,7 +259,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // Helper method for consistent TextFormField styling
   Widget _buildTextFormField({
     required TextEditingController controller,
     required String labelText,
@@ -285,9 +272,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(color: Colors.grey[700]),
-        floatingLabelStyle: const TextStyle(
-          color: Colors.black,
-        ), // Label saat fokus
+        floatingLabelStyle: const TextStyle(color: Colors.black),
         focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black, width: 2),
           borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -295,14 +280,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
           borderRadius: const BorderRadius.all(Radius.circular(12)),
-        ),
-        errorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 1),
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-        focusedErrorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
-          borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         contentPadding: const EdgeInsets.symmetric(
@@ -314,48 +291,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // Helper method for consistent DropdownButtonFormField styling
-  Widget _buildDropdownFormField<T>({
-    required T value,
-    required String labelText,
-    required List<DropdownMenuItem<T>> items,
-    required ValueChanged<T?> onChanged,
-  }) {
-    return DropdownButtonFormField<T>(
-      value: value,
-      style: const TextStyle(color: Colors.black),
-      dropdownColor: Colors.white,
-      icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
-      items: items,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: TextStyle(color: Colors.grey[700]),
-        floatingLabelStyle: const TextStyle(
-          color: Colors.black,
-        ), // Label saat fokus
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black, width: 2),
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-        ),
-        errorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 1),
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-        focusedErrorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
+  InputDecoration _disabledDecoration({required String labelText}) {
+    return InputDecoration(
+      labelText: labelText,
+      labelStyle: TextStyle(color: Colors.grey[700]),
+      floatingLabelStyle: const TextStyle(color: Colors.black),
+      disabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
       ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }
