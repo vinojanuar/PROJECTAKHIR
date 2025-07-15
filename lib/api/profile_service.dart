@@ -77,8 +77,7 @@ class ProfileApiService {
     print('Upload photo status: \\${response.statusCode}');
     print('Upload photo body: \\${response.body}');
     if (response.statusCode == 200) {
-      final jsonBody = json.decode(response.body);
-      return editFotoFromJson(jsonBody);
+      return editFotoFromJson(response.body);
     } else {
       throw Exception('Failed to upload profile photo: ${response.body}');
     }

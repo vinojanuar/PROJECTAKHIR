@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:projectakhir/api/absensi_service.dart';
-import 'package:projectakhir/model/izin_model.dart';
+import 'package:projectakhir/model/izin_model.dart'; // Pastikan path benar
 
 class IzinScreen extends StatefulWidget {
   const IzinScreen({super.key});
@@ -41,17 +41,22 @@ class _IzinScreenState extends State<IzinScreen> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(result.message!)));
-        Navigator.pop(context); // Pop screen on success
+        // --- Mengembalikan `true` saat sukses ---
+        Navigator.pop(context, true); // Pop screen and return true
       } else {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text("Gagal mengajukan izin")));
+        // --- Mengembalikan `false` saat gagal ---
+        Navigator.pop(context, false); // Pop screen and return false
       }
     } catch (e) {
       // Catch any errors during the API call
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
+      // --- Mengembalikan `false` saat error ---
+      Navigator.pop(context, false); // Pop screen and return false
     } finally {
       setState(() => _isSubmitting = false); // Always reset submitting state
     }

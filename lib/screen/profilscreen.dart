@@ -209,7 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           (profile.data?.profilePhoto != null &&
                               profile.data!.profilePhoto!.isNotEmpty)
                           ? NetworkImage(
-                              "${Endpoint.baseUrl}/${profile.data!.profilePhoto!}",
+                              "${Endpoint.baseUrl}/public/${profile.data!.profilePhoto!}",
                             )
                           : null,
                       child:

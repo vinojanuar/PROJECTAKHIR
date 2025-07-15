@@ -34,7 +34,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _selectedBatchId = '1';
   String _selectedTrainingId = '1';
 
-  final bool _isLoading = false;
+  bool _isLoading = false;
   File? _selectedImage;
 
   final List<Map<String, dynamic>> _batchOptions = [
@@ -54,8 +54,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
     _emailController = TextEditingController(text: widget.initialEmail);
-    _selectedBatchId = widget.initialBatchId;
-    _selectedTrainingId = widget.initialTrainingId;
+
+    // Validasi batch
+    if (_batchOptions.any((b) => b['id'] == widget.initialBatchId)) {
+      _selectedBatchId = widget.initialBatchId;
+    } else {
+      _selectedBatchId = _batchOptions.first['id'];
+    }
+
+    // Validasi training
+    if (_trainingOptions.any((t) => t['id'] == widget.initialTrainingId)) {
+      _selectedTrainingId = widget.initialTrainingId;
+    } else {
+      _selectedTrainingId = _trainingOptions.first['id'];
+    }
+
     _selectedGender = widget.initialGender;
   }
 
@@ -65,13 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
 
-      File file = File(pickedFile.path);
-      String? token = await PreferenceHandler.getToken();
-
-      await ProfileApiService.uploadProfilePhoto(
-        token: token!,
-        photoFile: file,
-      );
+      _selectedImage = File(pickedFile.path);
 
       setState(() {
         isUploadingPhoto = false;
@@ -85,42 +92,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  // Future<void> _submit() async {
-  //   if (!_formKey.currentState!.validate()) return;
-  //   setState(() => _isLoading = true);
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
 
-  //   try {
-  //     final result = await ProfileApiService.editProfile(
-  //       name: _nameController.text.trim(),
-  //       email: widget.initialEmail,
-  //       jenisKelamin: widget.initialGender,
-  //       batchId: widget.initialBatchId,
-  //       trainingId: widget.initialTrainingId,
-  //     );
+    try {
+      final result = await ProfileApiService.editProfile(
+        name: _nameController.text.trim(),
+        email: widget.initialEmail,
+        jenisKelamin: widget.initialGender,
+        batchId: widget.initialBatchId,
+        trainingId: widget.initialTrainingId,
+      );
 
-  //     if (_selectedImage != null) {
-  //       await ProfileApiService.uploadProfilePhoto(_selectedImage!);
-  //     }
+      if (_selectedImage != null) {
+        String? token = await PreferenceHandler.getToken();
+        await ProfileApiService.uploadProfilePhoto(
+          token: token!,
+          photoFile: _selectedImage!,
+        );
+      }
 
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text(result.message ?? "Profil berhasil diperbarui"),
-  //         backgroundColor: Colors.green,
-  //       ),
-  //     );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message ?? "Profil berhasil diperbarui"),
+          backgroundColor: Colors.green,
+        ),
+      );
 
-  //     Navigator.pop(context, true);
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text("Gagal memperbarui profil: $e"),
-  //         backgroundColor: Colors.red,
-  //       ),
-  //     );
-  //   } finally {
-  //     setState(() => _isLoading = false);
-  //   }
-  // }
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal memperbarui profil: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -232,7 +243,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _pickAndUploadPhoto,
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          _submit();
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
