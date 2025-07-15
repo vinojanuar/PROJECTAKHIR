@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:projectakhir/screen/loginscreen.dart';
+import 'package:projectakhir/screen/splashscreen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Absensi',
       theme: ThemeData(primarySwatch: Colors.pink),
-      home: const Loginscreen(),
+      home: const SplashScreen(),
     );
   }
 }

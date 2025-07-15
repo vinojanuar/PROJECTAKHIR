@@ -7,20 +7,7 @@ import 'package:projectakhir/helper/preference.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String initialName;
-  final String initialEmail;
-  final String initialBatchId;
-  final String initialTrainingId;
-  final String initialGender;
-
-  const EditProfileScreen({
-    super.key,
-    required this.initialName,
-    required this.initialEmail,
-    required this.initialBatchId,
-    required this.initialTrainingId,
-    required this.initialGender,
-  });
-
+  const EditProfileScreen({super.key, required this.initialName});
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
@@ -28,48 +15,14 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late TextEditingController _emailController;
   bool isUploadingPhoto = false;
-  String _selectedGender = 'L';
-  String _selectedBatchId = '1';
-  String _selectedTrainingId = '1';
-
   bool _isLoading = false;
   File? _selectedImage;
-
-  final List<Map<String, dynamic>> _batchOptions = [
-    {'id': '1', 'name': 'Batch A'},
-    {'id': '2', 'name': 'Batch B'},
-    {'id': '3', 'name': 'Batch C'},
-  ];
-
-  final List<Map<String, dynamic>> _trainingOptions = [
-    {'id': '1', 'name': 'Flutter Dasar'},
-    {'id': '2', 'name': 'Desain UI/UX'},
-    {'id': '3', 'name': 'Manajemen Proyek'},
-  ];
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
-    _emailController = TextEditingController(text: widget.initialEmail);
-
-    // Validasi batch
-    if (_batchOptions.any((b) => b['id'] == widget.initialBatchId)) {
-      _selectedBatchId = widget.initialBatchId;
-    } else {
-      _selectedBatchId = _batchOptions.first['id'];
-    }
-
-    // Validasi training
-    if (_trainingOptions.any((t) => t['id'] == widget.initialTrainingId)) {
-      _selectedTrainingId = widget.initialTrainingId;
-    } else {
-      _selectedTrainingId = _trainingOptions.first['id'];
-    }
-
-    _selectedGender = widget.initialGender;
   }
 
   Future<void> _pickAndUploadPhoto() async {
@@ -77,9 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
       if (pickedFile == null) return;
-
       _selectedImage = File(pickedFile.path);
-
       setState(() {
         isUploadingPhoto = false;
       });
@@ -87,7 +38,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         isUploadingPhoto = false;
       });
-
       print("Upload error: $e");
     }
   }
@@ -95,16 +45,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-
     try {
       final result = await ProfileApiService.editProfile(
         name: _nameController.text.trim(),
-        email: widget.initialEmail,
-        jenisKelamin: widget.initialGender,
-        batchId: widget.initialBatchId,
-        trainingId: widget.initialTrainingId,
+        email: '', // email dihapus, bisa dikosongkan
       );
-
       if (_selectedImage != null) {
         String? token = await PreferenceHandler.getToken();
         await ProfileApiService.uploadProfilePhoto(
@@ -112,14 +57,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           photoFile: _selectedImage!,
         );
       }
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.message ?? "Profil berhasil diperbarui"),
           backgroundColor: Colors.green,
         ),
       );
-
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -136,7 +79,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 
@@ -145,7 +87,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF4F46E5),
         title: const Text("Edit Profil", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -160,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: Color(0xFF4F46E5).withOpacity(0.15),
                     backgroundImage: _selectedImage != null
                         ? FileImage(_selectedImage!)
                         : const AssetImage(
@@ -176,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     bottom: 0,
                     child: CircleAvatar(
                       radius: 20,
-                      backgroundColor: Colors.black,
+                      backgroundColor: const Color(0xFF4F46E5),
                       child: IconButton(
                         icon: const Icon(
                           Icons.edit,
@@ -196,49 +138,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 validator: (value) =>
                     value!.isEmpty ? 'Nama tidak boleh kosong' : null,
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                enabled: false,
-                style: const TextStyle(color: Colors.black),
-                decoration: _disabledDecoration(labelText: 'Email'),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedGender,
-                items: const [
-                  DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
-                  DropdownMenuItem(value: 'P', child: Text('Perempuan')),
-                ],
-                onChanged: null,
-                decoration: _disabledDecoration(labelText: 'Jenis Kelamin'),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedBatchId,
-                items: _batchOptions.map((batch) {
-                  return DropdownMenuItem<String>(
-                    value: batch['id'].toString(), // ⬅️ konversi ke String
-                    child: Text(batch['name']),
-                  );
-                }).toList(),
-                onChanged: null,
-                decoration: _disabledDecoration(labelText: 'Batch'),
-              ),
-
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedTrainingId,
-                items: _trainingOptions.map((training) {
-                  return DropdownMenuItem<String>(
-                    value: training['id'].toString(), // ⬅️ konversi ke String
-                    child: Text(training['name']),
-                  );
-                }).toList(),
-                onChanged: null,
-                decoration: _disabledDecoration(labelText: 'Training'),
-              ),
-
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -249,7 +148,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           _submit();
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: Color(0xFF4F46E5),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -303,20 +202,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
       validator: validator,
-    );
-  }
-
-  InputDecoration _disabledDecoration({required String labelText}) {
-    return InputDecoration(
-      labelText: labelText,
-      labelStyle: TextStyle(color: Colors.grey[700]),
-      floatingLabelStyle: const TextStyle(color: Colors.black),
-      disabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
-      ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

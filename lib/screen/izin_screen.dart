@@ -67,13 +67,16 @@ class _IzinScreenState extends State<IzinScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFF4F46E5),
         elevation: 0,
         title: const Text(
           "Ajukan Izin",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Color.fromARGB(255, 231, 228, 228),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
       ),
       body: Padding(
@@ -109,7 +112,7 @@ class _IzinScreenState extends State<IzinScreen> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[900],
+                    backgroundColor: Color(0xFF4F46E5),
                   ),
                   onPressed: _isSubmitting
                       ? null

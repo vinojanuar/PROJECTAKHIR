@@ -53,7 +53,11 @@ class _RegisscreenState extends State<Regisscreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Gagal memuat data: ${e.toString()}"),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade400,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -70,9 +74,13 @@ class _RegisscreenState extends State<Regisscreen> {
         selectedBatchId == null ||
         selectedTrainingId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Semua field wajib diisi!"),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text("Semua field wajib diisi!"),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
       return;
@@ -83,9 +91,13 @@ class _RegisscreenState extends State<Regisscreen> {
       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
     ).hasMatch(emailController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Format email tidak valid!"),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text("Format email tidak valid!"),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
       return;
@@ -94,9 +106,13 @@ class _RegisscreenState extends State<Regisscreen> {
     // Validasi password minimal 6 karakter
     if (passwordController.text.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Password minimal 6 karakter!"),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text("Password minimal 6 karakter!"),
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
       return;
@@ -118,9 +134,13 @@ class _RegisscreenState extends State<Regisscreen> {
 
       if (res["data"] != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Register berhasil! Silahkan login."),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text("Register berhasil! Silahkan login."),
+            backgroundColor: Colors.green.shade400,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
 
@@ -136,7 +156,11 @@ class _RegisscreenState extends State<Regisscreen> {
             content: Text(
               "Email sudah digunakan: ${res["errors"]["email"][0]}",
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade400,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       } else {
@@ -145,7 +169,11 @@ class _RegisscreenState extends State<Regisscreen> {
             content: Text(
               "Gagal register: ${res["message"] ?? "Terjadi kesalahan"}",
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade400,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -153,7 +181,11 @@ class _RegisscreenState extends State<Regisscreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Terjadi kesalahan: ${e.toString()}"),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
     }
@@ -182,37 +214,56 @@ class _RegisscreenState extends State<Regisscreen> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Color(0xFF374151),
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          obscureText: obscureText,
-          style: const TextStyle(color: Colors.black, fontSize: 16),
-          decoration: InputDecoration(
-            hintText: hintText ?? "Masukkan $label",
-            hintStyle: TextStyle(color: Colors.grey[500]),
-            prefixIcon: Icon(icon, color: Colors.grey),
-            suffixIcon: suffixIcon,
-            filled: true,
-            fillColor: Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.black, width: 2),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            style: const TextStyle(color: Color(0xFF1E293B), fontSize: 16),
+            decoration: InputDecoration(
+              hintText: hintText ?? "Masukkan $label",
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+              prefixIcon: Icon(icon, color: const Color(0xFF64748B)),
+              suffixIcon: suffixIcon,
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 18,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFFE2E8F0),
+                  width: 1.5,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFF4F46E5),
+                  width: 2,
+                ),
+              ),
             ),
           ),
         ),
@@ -223,8 +274,8 @@ class _RegisscreenState extends State<Regisscreen> {
   Widget _buildDropdownField({
     required String label,
     required dynamic value,
-    required List<DropdownMenuItem> items,
-    required ValueChanged onChanged,
+    required List<DropdownMenuItem<dynamic>> items,
+    required ValueChanged<dynamic> onChanged,
     required IconData icon,
   }) {
     return Column(
@@ -235,38 +286,60 @@ class _RegisscreenState extends State<Regisscreen> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Color(0xFF374151),
           ),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField(
-          value: value,
-          style: const TextStyle(color: Colors.black, fontSize: 16),
-          dropdownColor: Colors.white,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-          items: items,
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            hintText: "Pilih $label",
-            hintStyle: TextStyle(color: Colors.grey[500]),
-            prefixIcon: Icon(icon, color: Colors.grey),
-            filled: true,
-            fillColor: Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: DropdownButtonFormField(
+            value: value,
+            style: const TextStyle(color: Color(0xFF1E293B), fontSize: 16),
+            dropdownColor: Colors.white,
+            icon: const Icon(
+              Icons.keyboard_arrow_down,
+              color: Color(0xFF64748B),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.black, width: 2),
+            items: items,
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              hintText: "Pilih $label",
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+              prefixIcon: Icon(icon, color: const Color(0xFF64748B)),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 18,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFFE2E8F0),
+                  width: 1.5,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: Color(0xFF4F46E5),
+                  width: 2,
+                ),
+              ),
             ),
           ),
         ),
@@ -277,119 +350,205 @@ class _RegisscreenState extends State<Regisscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFC), // Same as LoginScreen
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header Section
-            Container(
-              height: 200,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF000000), Color(0xFF2C2C2C)],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header Section with Gradient (same as LoginScreen)
+              Container(
+                height: 250,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF4F46E5), // Indigo
+                      Color(0xFF7C3AED), // Purple
+                    ],
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(32),
+                    bottomRight: Radius.circular(32),
+                  ),
                 ),
-              ),
-              child: Stack(
-                children: [
-                  // Background Pattern
-                  Positioned(
-                    top: -30,
-                    right: -30,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.1),
+                child: Stack(
+                  children: [
+                    // Background Pattern
+                    Positioned(
+                      top: -50,
+                      right: -50,
+                      child: Container(
+                        width: 200,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.1),
+                        ),
                       ),
                     ),
-                  ),
-                  // Content
-                  Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Row(
-                      children: [
-                        // Back Button
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Loginscreen(),
-                                ),
-                              );
-                            },
-                          ),
+                    Positioned(
+                      bottom: -30,
+                      left: -30,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.05),
                         ),
-                        const SizedBox(width: 16),
-                        // Title
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Daftar Akun",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                "Bergabunglah dengan sistem absensi",
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Form Section
-            Expanded(
-              child: isLoadingData
-                  ? const Center(
+                    Positioned(
+                      top: 50,
+                      left: 50,
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.08),
+                        ),
+                      ),
+                    ),
+                    // Content
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircularProgressIndicator(color: Colors.black),
-                          SizedBox(height: 16),
-                          Text(
-                            "Memuat data...",
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                          // Back Button
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Loginscreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Icon
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 20,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.person_add_rounded,
+                              size: 32,
+                              color: Color(0xFF4F46E5),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Title
+                          const Text(
+                            "Create Account",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Join our attendance system",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.2,
+                            ),
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                ),
+              ),
+              // Form Section
+              isLoadingData
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48.0),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(color: Color(0xFF4F46E5)),
+                            SizedBox(height: 16),
+                            Text(
+                              "Memuat data...",
+                              style: TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     )
-                  : SingleChildScrollView(
+                  : Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 16),
+
+                          // Welcome Text
+                          const Text(
+                            "Bergabunglah dengan Kami",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
                           const SizedBox(height: 8),
+                          const Text(
+                            "Isi form berikut untuk membuat akun",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF64748B),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
 
                           // Name Field
                           _buildInputField(
@@ -403,28 +562,28 @@ class _RegisscreenState extends State<Regisscreen> {
 
                           // Email Field
                           _buildInputField(
-                            label: "Email",
+                            label: "Email Address",
                             controller: emailController,
                             icon: Icons.email_outlined,
                             keyboardType: TextInputType.emailAddress,
-                            hintText: "Masukkan alamat email Anda",
+                            hintText: "name@example.com",
                           ),
 
                           const SizedBox(height: 20),
 
                           // Password Field
                           _buildInputField(
-                            label: "Kata Sandi",
+                            label: "Password",
                             controller: passwordController,
-                            icon: Icons.lock_outline,
+                            icon: Icons.lock_outline_rounded,
                             obscureText: _obscureText,
-                            hintText: "Masukkan kata sandi (min. 6 karakter)",
+                            hintText: "Masukkan password (min. 6 karakter)",
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureText
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: Colors.grey,
+                                color: const Color(0xFF64748B),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -507,19 +666,37 @@ class _RegisscreenState extends State<Regisscreen> {
                           const SizedBox(height: 32),
 
                           // Register Button
-                          SizedBox(
+                          Container(
                             width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF4F46E5,
+                                  ).withOpacity(0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
+                                backgroundColor: Colors.transparent,
                                 foregroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 18,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                elevation: 0,
                               ),
                               onPressed: isLoading ? null : register,
                               child: isLoading
@@ -528,11 +705,11 @@ class _RegisscreenState extends State<Regisscreen> {
                                       width: 24,
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
-                                        strokeWidth: 2,
+                                        strokeWidth: 2.5,
                                       ),
                                     )
                                   : const Text(
-                                      "Daftar Sekarang",
+                                      "Create Account",
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16,
@@ -542,47 +719,96 @@ class _RegisscreenState extends State<Regisscreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 32),
 
-                          // Login Link
+                          // Divider
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
-                                "Sudah punya akun?",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w500,
+                              Expanded(
+                                child: Container(
+                                  height: 1,
+                                  color: const Color(0xFFE2E8F0),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const Loginscreen(),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  "Masuk Sekarang",
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  "atau",
                                   style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF94A3B8),
                                     fontSize: 14,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
+                              Expanded(
+                                child: Container(
+                                  height: 1,
+                                  color: const Color(0xFFE2E8F0),
+                                ),
+                              ),
                             ],
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          // Login Link
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                    "Already have an account?",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF64748B),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Loginscreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text(
+                                      "Sign In",
+                                      style: TextStyle(
+                                        color: Color(0xFF4F46E5),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
 
                           const SizedBox(height: 20),
                         ],
                       ),
                     ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

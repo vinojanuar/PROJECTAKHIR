@@ -9,6 +9,7 @@ import 'package:projectakhir/model/absentoday_model.dart';
 import 'package:projectakhir/model/profile_model.dart';
 import 'package:projectakhir/screen/editprofile_screen.dart';
 import 'package:projectakhir/screen/loginscreen.dart';
+import 'package:projectakhir/screen/homescreen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -78,16 +79,31 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1a1a1a), Color(0xFF000000), Color(0xFF2a2a2a)],
-            stops: [0.0, 0.5, 1.0],
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.home_outlined, color: Color(0xFF4F46E5)),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+          },
+          tooltip: "Kembali ke Home",
+        ),
+        title: const Text(
+          "Profil",
+          style: TextStyle(
+            color: Color(0xFF4F46E5),
+            fontWeight: FontWeight.bold,
           ),
         ),
+        centerTitle: true,
+      ),
+      body: Container(
+        decoration: const BoxDecoration(color: Colors.white),
         child: SafeArea(
           child: FutureBuilder<Profile?>(
             future: _futureProfile,
@@ -175,90 +191,117 @@ class _ProfileScreenState extends State<ProfileScreen>
       builder: (context, child) {
         return ScaleTransition(
           scale: _profileScaleAnimation,
-          child: Column(
-            children: [
-              Hero(
-                tag: "profile-avatar",
-                child: Container(
-                  padding: const EdgeInsets.all(4),
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Color(0xFFF3F4FE),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Color(0xFF4F46E5).withOpacity(0.15),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF4F46E5).withOpacity(0.08),
+                  blurRadius: 24,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Foto profil dengan shadow (center)
+                Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [Colors.white, Colors.grey],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 5),
+                        color: Color(0xFF4F46E5).withOpacity(0.18),
+                        blurRadius: 24,
+                        offset: Offset(0, 8),
                       ),
                     ],
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black,
-                    ),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage:
-                          (profile.data?.profilePhoto != null &&
-                              profile.data!.profilePhoto!.isNotEmpty)
-                          ? NetworkImage(
-                              "${Endpoint.baseUrl}/public/${profile.data!.profilePhoto!}",
-                            )
-                          : null,
-                      child:
-                          (profile.data?.profilePhoto == null ||
-                              profile.data!.profilePhoto!.isEmpty)
-                          ? const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.grey,
-                            )
-                          : null,
+                  child: Hero(
+                    tag: "profile-avatar",
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF7C3AED),
+                        ),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Color(0xFF4F46E5).withOpacity(0.15),
+                          backgroundImage:
+                              (profile.data?.profilePhoto != null &&
+                                  profile.data!.profilePhoto!.isNotEmpty)
+                              ? NetworkImage(
+                                  "${Endpoint.baseUrl}/public/${profile.data!.profilePhoto!}",
+                                )
+                              : null,
+                          child:
+                              (profile.data?.profilePhoto == null ||
+                                  profile.data!.profilePhoto!.isEmpty)
+                              ? const Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.grey,
+                                )
+                              : null,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                profile.data?.name ?? "-",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28,
-                  color: Colors.white,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  profile.data?.email ?? "-",
+                const SizedBox(height: 22),
+                // Nama (center)
+                Text(
+                  profile.data?.name ?? "-",
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: Color(0xFF4F46E5),
+                    letterSpacing: 0.5,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                // Email capsule (center)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF4F46E5).withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    profile.data?.email ?? "-",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFF4F46E5),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -269,16 +312,20 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey[300]!, width: 1),
+          color: Color(0xFFF3F4FE), // ungu sangat muda
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: Color(0xFF4F46E5).withOpacity(0.15),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Color(0xFF4F46E5).withOpacity(0.10),
+              blurRadius: 18,
+              offset: Offset(0, 8),
             ),
           ],
         ),
@@ -290,27 +337,27 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Color(0xFF4F46E5),
+                    shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.analytics_outlined,
                     color: Colors.white,
-                    size: 20,
-                  ),
+                    size: 22,
+                  ), // ganti icon sesuai section
                 ),
-                const SizedBox(width: 16),
-                const Text(
-                  "Statistik Absensi",
+                const SizedBox(width: 14),
+                Text(
+                  "Statistik Absensi", // ganti judul sesuai section
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black,
+                    fontSize: 20,
+                    color: Color(0xFF4F46E5),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             FutureBuilder<AbsenStatus?>(
               future: _futureAbsenStatus,
               builder: (context, snapshot) {
@@ -367,16 +414,20 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey[300]!, width: 1),
+          color: Color(0xFFF3F4FE), // ungu sangat muda
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: Color(0xFF4F46E5).withOpacity(0.15),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: Color(0xFF4F46E5).withOpacity(0.10),
+              blurRadius: 18,
+              offset: Offset(0, 8),
             ),
           ],
         ),
@@ -388,27 +439,27 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Color(0xFF4F46E5),
+                    shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.today_outlined,
                     color: Colors.white,
-                    size: 20,
-                  ),
+                    size: 22,
+                  ), // ganti icon sesuai section
                 ),
-                const SizedBox(width: 16),
-                const Text(
-                  "Absensi Hari Ini",
+                const SizedBox(width: 14),
+                Text(
+                  "Absensi Hari Ini", // ganti judul sesuai section
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black,
+                    fontSize: 20,
+                    color: Color(0xFF4F46E5),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             FutureBuilder<AbsenToday?>(
               future: _futureAbsenToday,
               builder: (context, snapshot) {
@@ -494,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: Color(0xFF4F46E5),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.grey[300]!, width: 1),
         ),
@@ -573,12 +624,12 @@ class _ProfileScreenState extends State<ProfileScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey[300]!, width: 1),
+          border: Border.all(color: Colors.grey[200]!, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
-              offset: const Offset(0, 5),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -595,11 +646,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                   MaterialPageRoute(
                     builder: (context) => EditProfileScreen(
                       initialName: profile.data?.name ?? '',
-                      initialEmail: profile.data?.email ?? '',
-                      initialGender: profile.data?.jenisKelamin ?? '',
-                      initialBatchId: profile.data?.batch?.id?.toString() ?? '',
-                      initialTrainingId:
-                          profile.data?.training?.id?.toString() ?? '',
                     ),
                   ),
                 );
@@ -675,7 +721,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildLogoutButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -687,28 +733,35 @@ class _ProfileScreenState extends State<ProfileScreen>
               (route) => false,
             );
           },
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           child: Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.symmetric(vertical: 18),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
+              color: Color(0xFFF3F4FE),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 1,
+                color: Color(0xFF4F46E5).withOpacity(0.15),
+                width: 1.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF4F46E5).withOpacity(0.08),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.logout_outlined, color: Colors.white, size: 20),
+                Icon(Icons.logout_outlined, color: Color(0xFF4F46E5), size: 22),
                 SizedBox(width: 12),
                 Text(
                   "Keluar",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF4F46E5),
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 18,
                   ),
                 ),
               ],

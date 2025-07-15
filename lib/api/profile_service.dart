@@ -29,11 +29,16 @@ class ProfileApiService {
   static Future<EditProfile> editProfile({
     required String name,
     required String email,
-    required String jenisKelamin,
-    required String batchId,
-    required String trainingId,
+    String? jenisKelamin,
+    String? batchId,
+    String? trainingId,
   }) async {
     final token = await PreferenceHandler.getToken();
+
+    final Map<String, dynamic> body = {'name': name, 'email': email};
+    if (jenisKelamin != null) body['jenis_kelamin'] = jenisKelamin;
+    if (batchId != null) body['batch_id'] = batchId;
+    if (trainingId != null) body['training_id'] = trainingId;
 
     final response = await http.put(
       Uri.parse(Endpoint.profile),
@@ -42,13 +47,7 @@ class ProfileApiService {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: json.encode({
-        'name': name,
-        'email': email,
-        'jenis_kelamin': jenisKelamin,
-        'batch_id': batchId,
-        'training_id': trainingId,
-      }),
+      body: json.encode(body),
     );
 
     if (response.statusCode == 200) {

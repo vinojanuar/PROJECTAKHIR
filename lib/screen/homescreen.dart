@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
               await _performCheckOut();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: Color(0xFF4F46E5),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -250,12 +250,17 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Header Section (sama seperti RegisterScreen)
             Container(
+              width: double.infinity,
               height: 200,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF000000), Color(0xFF2C2C2C)],
+                  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
                 ),
               ),
               child: Stack(
@@ -279,131 +284,80 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Profile Section
+                        // Profile Section (nama & email saja)
                         FutureBuilder<Profile?>(
                           future: _futureProfile,
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Row(
-                                children: const [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.white,
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Text(
-                                    "Memuat...",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                              return const Text(
+                                "Memuat...",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               );
                             } else if (snapshot.hasError) {
-                              return Row(
-                                children: const [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.white,
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Text(
-                                    "Gagal memuat profil",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              final profile = snapshot.data!;
-                              return Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage:
-                                        (profile.data?.profilePhoto != null &&
-                                            profile
-                                                .data!
-                                                .profilePhoto!
-                                                .isNotEmpty)
-                                        ? NetworkImage(
-                                            "${Endpoint.baseUrl}/public${profile.data!.profilePhoto}",
-                                          )
-                                        : null,
-                                    child:
-                                        (profile.data?.profilePhoto == null ||
-                                            profile.data!.profilePhoto!.isEmpty)
-                                        ? const Icon(
-                                            Icons.person,
-                                            color: Colors.black,
-                                          )
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Selamat Datang!",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                        Text(
-                                          profile.data?.name ?? "-",
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          profile.data?.email ?? "-",
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                              return const Text(
+                                "Gagal memuat profil",
+                                style: TextStyle(color: Colors.white),
                               );
                             }
+                            final profile = snapshot.data!;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Selamat Datang!",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  profile.data?.name ?? "-",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  profile.data?.email ?? "-",
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            );
                           },
                         ),
                         const Spacer(),
                         // Date & Time
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                            horizontal: 20,
+                            vertical: 12,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
                             "$_currentDate • $_currentTime",
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
@@ -514,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
+                              backgroundColor: Color(0xFF4F46E5),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
@@ -775,7 +729,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF4F46E5),
         onPressed: () {
           showDialog(
             context: context,
@@ -811,7 +765,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _showCheckOutDialog();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: Color(0xFF4F46E5),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -832,7 +786,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-        color: Colors.black,
+        color: Color(0xFF4F46E5),
         shape: const CircularNotchedRectangle(),
         notchMargin: 8,
         child: Row(

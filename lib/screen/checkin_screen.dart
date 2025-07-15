@@ -150,7 +150,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF000000), Color(0xFF2C2C2C)],
+                  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
                 ),
               ),
               child: Stack(
@@ -324,7 +324,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                                     right: 8,
                                     child: FloatingActionButton(
                                       mini: true,
-                                      backgroundColor: Colors.black,
+                                      backgroundColor: Color(0xFF4F46E5),
                                       onPressed: _ambilLokasiDanAlamat,
                                       child: const Icon(
                                         Icons.my_location,
@@ -343,7 +343,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                             children: [
                               const Icon(
                                 Icons.location_on,
-                                color: Colors.black,
+                                color: Color(0xFF4F46E5),
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -380,7 +380,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                               children: [
                                 const Icon(
                                   Icons.calendar_today,
-                                  color: Colors.black,
+                                  color: Color(0xFF4F46E5),
                                   size: 20,
                                 ),
                                 const SizedBox(height: 8),
@@ -411,7 +411,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                               children: [
                                 const Icon(
                                   Icons.access_time,
-                                  color: Colors.black,
+                                  color: Color(0xFF4F46E5),
                                   size: 20,
                                 ),
                                 const SizedBox(height: 8),
@@ -512,7 +512,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                                     }
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
+                              backgroundColor: Color(0xFF4F46E5),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -554,7 +554,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.black,
-                              side: const BorderSide(color: Colors.black),
+                              side: const BorderSide(color: Color(0xFF4F46E5)),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
