@@ -19,12 +19,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _isLoading = false;
   File? _selectedImage;
 
+  // Fungsi yang dijalankan saat inisialisasi, mengisi controller dengan nama awal.
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
   }
 
+  // Fungsi untuk memilih dan mengunggah foto profil dari galeri.
   Future<void> _pickAndUploadPhoto() async {
     try {
       final picker = ImagePicker();
@@ -42,6 +44,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // Fungsi untuk submit perubahan profil (nama dan foto) ke server.
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -76,12 +79,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // Membersihkan controller saat widget di-dispose untuk mencegah memory leak.
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
   }
 
+  // Widget utama EditProfileScreen yang menampilkan form edit nama dan foto.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -173,6 +178,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  // Membuat TextFormField custom untuk input nama dengan validasi.
   Widget _buildTextFormField({
     required TextEditingController controller,
     required String labelText,

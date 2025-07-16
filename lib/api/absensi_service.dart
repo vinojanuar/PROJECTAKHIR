@@ -11,7 +11,7 @@ import 'package:projectakhir/model/historyabsen_model.dart';
 import 'package:projectakhir/model/izin_model.dart';
 
 class AbsenApiService {
-  // === CHECK IN ===
+  // Fungsi untuk melakukan proses check-in, mengirim data ke API dan mengembalikan model CheckIn jika berhasil.
   static Future<CheckIn?> checkIn({
     required String attendanceDate,
     required String checkInTime,
@@ -48,7 +48,7 @@ class AbsenApiService {
     }
   }
 
-  // === CHECK OUT ===
+  // Fungsi untuk melakukan proses check-out, mengirim data ke API dan mengembalikan true jika berhasil.
   static Future<bool> checkOut({
     required String attendanceDate,
     required String checkOutTime,
@@ -76,7 +76,7 @@ class AbsenApiService {
     return response.statusCode == 200;
   }
 
-  // === HISTORY ABSEN ===
+  // Fungsi untuk mengambil riwayat absensi user dari API.
   static Future<List<Datum>?> fetchHistoryAbsen() async {
     final token = await PreferenceHandler.getToken();
 
@@ -93,7 +93,7 @@ class AbsenApiService {
     }
   }
 
-  // === ABSEN STATUS ===
+  // Fungsi untuk mengambil statistik status absensi user dari API.
   static Future<AbsenStatus?> fetchAbsenStatus() async {
     final token = await PreferenceHandler.getToken();
     final url = Uri.parse("${Endpoint.baseUrlApi}/absen/stats");
@@ -110,7 +110,7 @@ class AbsenApiService {
     }
   }
 
-  // === ABSEN TODAY ===
+  // Fungsi untuk mengambil data absensi hari ini dari API.
   static Future<AbsenToday?> fetchAbsenToday() async {
     final token = await PreferenceHandler.getToken();
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -130,7 +130,7 @@ class AbsenApiService {
     }
   }
 
-  // === POST IZIN ===
+  // Fungsi untuk mengirim pengajuan izin ke API dan mengembalikan model Izin jika berhasil.
   static Future<Izin?> postIzin({
     required String date,
     required String alasanIzin,
@@ -157,7 +157,7 @@ class AbsenApiService {
     }
   }
 
-  // === FETCH IZIN (GET IZIN TODAY) ===
+  // Fungsi untuk mengambil data izin hari ini dari API.
   static Future<Izin?> fetchIzinHariIni() async {
     final token = await PreferenceHandler.getToken();
 

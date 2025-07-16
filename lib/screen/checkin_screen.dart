@@ -23,6 +23,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
   int? _userId;
   bool _isLoading = false;
 
+  // Fungsi yang dijalankan saat inisialisasi, memuat userId dan mengambil lokasi serta alamat.
   @override
   void initState() {
     super.initState();
@@ -30,6 +31,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
     _ambilLokasiDanAlamat();
   }
 
+  // Fungsi untuk memuat userId dari SharedPreferences.
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -37,6 +39,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
     });
   }
 
+  // Fungsi untuk mengambil lokasi dan alamat saat ini, serta update marker di peta.
   Future<void> _ambilLokasiDanAlamat() async {
     try {
       setState(() {
@@ -95,6 +98,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
     }
   }
 
+  // Membuat kartu informasi dengan judul dan konten custom.
   Widget _buildInfoCard({
     required String title,
     required Widget content,
@@ -132,6 +136,7 @@ class _CheckinScreenState extends State<CheckinScreen> {
     );
   }
 
+  // Widget utama CheckinScreen yang menampilkan form check-in dan peta.
   @override
   Widget build(BuildContext context) {
     final String today = DateFormat('EEEE', 'id_ID').format(DateTime.now());

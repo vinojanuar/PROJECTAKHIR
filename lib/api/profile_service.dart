@@ -9,6 +9,7 @@ import 'package:projectakhir/model/editprofile_model.dart';
 import 'package:projectakhir/model/profile_model.dart';
 
 class ProfileApiService {
+  // Fungsi untuk mengambil data profil user dari API.
   static Future<Profile> getProfile() async {
     String? token = await PreferenceHandler.getToken();
     final response = await http.get(
@@ -26,6 +27,7 @@ class ProfileApiService {
     }
   }
 
+  // Fungsi untuk mengedit profil user (nama, email, dll) melalui API.
   static Future<EditProfile> editProfile({
     required String name,
     required String email,
@@ -57,6 +59,7 @@ class ProfileApiService {
     }
   }
 
+  // Fungsi untuk mengunggah foto profil user ke server melalui API.
   static Future<EditFoto> uploadProfilePhoto({
     required String token,
     required File photoFile,

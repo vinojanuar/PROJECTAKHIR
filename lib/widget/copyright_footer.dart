@@ -21,7 +21,7 @@ class CopyrightFooter extends StatelessWidget {
           SizedBox(width: 8), // Jarak antara ikon dan teks
           // Teks copyright
           Text(
-            "Copyright",
+            "Copyright 2025",
             style: TextStyle(
               color: Colors.grey,
               fontSize: 16,

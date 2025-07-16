@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart'; // Untuk geolokasi
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart'; // Untuk geolokasi
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Untuk geocoding
 
 class MapsPage extends StatefulWidget {
@@ -17,6 +17,7 @@ class _MapsPageState extends State<MapsPage> {
   String _currentAddress = "Mencari Lokasi..."; // Alamat saat ini
   Marker? _marker; // Marker untuk lokasi saat ini
 
+  // Fungsi yang dijalankan saat inisialisasi, memanggil fungsi untuk mendapatkan lokasi.
   @override
   void initState() {
     super.initState();
@@ -24,7 +25,7 @@ class _MapsPageState extends State<MapsPage> {
     _getCurrentLocation();
   }
 
-  // Fungsi untuk mendapatkan lokasi saat ini
+  // Fungsi untuk mendapatkan lokasi saat ini, meminta izin lokasi, dan update marker serta alamat.
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -89,6 +90,7 @@ class _MapsPageState extends State<MapsPage> {
     });
   }
 
+  // Widget utama MapsPage yang menampilkan Google Map dan alamat saat ini.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,10 +135,10 @@ class _MapsPageState extends State<MapsPage> {
       ),
       // Tombol Floating Action untuk refresh lokasi
       floatingActionButton: FloatingActionButton(
-        onPressed:
-            _getCurrentLocation, // Panggil fungsi _getCurrentLocation saat ditekan
+        onPressed: _getCurrentLocation,
+        tooltip:
+            "Refresh Lokasi", // Panggil fungsi _getCurrentLocation saat ditekan
         child: const Icon(Icons.refresh),
-        tooltip: "Refresh Lokasi",
       ),
     );
   }

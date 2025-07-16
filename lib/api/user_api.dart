@@ -9,7 +9,7 @@ import 'package:projectakhir/model/batch_model.dart';
 import 'package:projectakhir/model/training_model.dart';
 
 class UserService {
-  /// REGISTER USER
+  /// Fungsi untuk registrasi user baru ke API.
   Future<Map<String, dynamic>> registerUser({
     required String name,
     required String email,
@@ -44,7 +44,7 @@ class UserService {
     }
   }
 
-  /// LOGIN USER
+  /// Fungsi untuk login user ke API dan menyimpan token jika berhasil.
   Future<Map<String, dynamic>> loginUser({
     required String email,
     required String password,
@@ -75,7 +75,7 @@ class UserService {
     }
   }
 
-  /// GET LIST BATCH
+  /// Fungsi untuk mengambil daftar batch dari API.
   Future<Map<String, dynamic>> getListBatch() async {
     final response = await http.get(
       Uri.parse(Endpoint.batch),
@@ -93,7 +93,7 @@ class UserService {
     }
   }
 
-  /// GET LIST TRAINING
+  /// Fungsi untuk mengambil daftar training dari API.
   Future<Map<String, dynamic>> getListTraining() async {
     final response = await http.get(
       Uri.parse(Endpoint.training),

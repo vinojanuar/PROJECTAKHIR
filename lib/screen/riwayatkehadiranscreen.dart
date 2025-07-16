@@ -18,6 +18,7 @@ class _HistoryAbsenScreenState extends State<HistoryAbsenScreen> {
     _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
   }
 
+  // Widget utama HistoryAbsenScreen yang menampilkan daftar riwayat kehadiran.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,7 +185,7 @@ class _HistoryAbsenScreenState extends State<HistoryAbsenScreen> {
     );
   }
 
-  /// Fungsi untuk mendapatkan nama hari dari DateTime
+  // Fungsi untuk mendapatkan nama hari dari DateTime.
   String _getDayName(DateTime? date) {
     if (date == null) return '-';
     final days = [

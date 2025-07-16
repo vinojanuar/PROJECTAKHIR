@@ -27,12 +27,14 @@ class _RegisscreenState extends State<Regisscreen> {
   bool isLoading = false;
   bool isLoadingData = true;
 
+  // Fungsi yang dijalankan saat inisialisasi, memuat data batch dan training.
   @override
   void initState() {
     super.initState();
     fetchBatchAndTraining();
   }
 
+  // Fungsi untuk mengambil data batch dan training dari API.
   Future<void> fetchBatchAndTraining() async {
     try {
       final batchData = await userService.getListBatch();
@@ -65,6 +67,7 @@ class _RegisscreenState extends State<Regisscreen> {
     }
   }
 
+  // Fungsi untuk melakukan proses registrasi user, validasi input, dan kirim ke API.
   void register() async {
     // Validasi input
     if ([
@@ -198,6 +201,7 @@ class _RegisscreenState extends State<Regisscreen> {
     }
   }
 
+  // Membuat field input custom untuk form register.
   Widget _buildInputField({
     required String label,
     required TextEditingController controller,

@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Datum>?> _futureHistoryAbsen;
   late Future<Profile?> _futureProfile;
 
+  // Fungsi yang dijalankan saat inisialisasi, mengatur timer, memuat data absensi hari ini, riwayat absen, dan profil.
   @override
   void initState() {
     super.initState();
@@ -53,18 +54,21 @@ class _HomeScreenState extends State<HomeScreen> {
     _futureProfile = ProfileApiService.getProfile();
   }
 
+  // Membersihkan timer saat widget di-dispose untuk mencegah memory leak.
   @override
   void dispose() {
     _timer.cancel();
     super.dispose();
   }
 
+  // Fungsi untuk refresh data riwayat absen.
   Future<void> _refreshHistoryAbsen() async {
     setState(() {
       _futureHistoryAbsen = AbsenApiService.fetchHistoryAbsen();
     });
   }
 
+  // Fungsi untuk mengambil lokasi dan alamat saat ini.
   Future<void> _ambilLokasiDanAlamat() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -103,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk navigasi ke halaman Check In dan update data setelah kembali.
   void _navigateToCheckIn() async {
     final result = await Navigator.push(
       context,
@@ -118,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk menampilkan dialog konfirmasi Check Out.
   void _showCheckOutDialog() {
     showDialog(
       context: context,
@@ -155,6 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Fungsi untuk melakukan proses Check Out dan update data.
   Future<void> _performCheckOut() async {
     await _ambilLokasiDanAlamat();
     final now = DateTime.now();
@@ -182,6 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk memuat data absensi hari ini dan update tampilan waktu check-in/out.
   Future<void> _loadTodayAttendance() async {
     try {
       final history = await AbsenApiService.fetchHistoryAbsen();
@@ -204,6 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Membuat kartu informasi dengan judul dan konten custom.
   Widget _buildInfoCard({
     required String title,
     required Widget content,
@@ -241,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Widget utama HomeScreen yang menampilkan dashboard absensi.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

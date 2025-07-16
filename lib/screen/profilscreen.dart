@@ -77,6 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     super.dispose();
   }
 
+  // Widget utama ProfileScreen yang menampilkan profil, statistik, absensi hari ini, menu, dan tombol logout.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,6 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat animasi tampilan profil user di bagian atas halaman profil.
   Widget _buildAnimatedProfileSection(Profile profile) {
     return AnimatedBuilder(
       animation: _profileAnimationController,
@@ -310,6 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat section statistik absensi (hadir, izin, alpha) dengan FutureBuilder.
   Widget _buildStatsSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -412,6 +415,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat section absensi hari ini (check-in, check-out, izin) dengan FutureBuilder.
   Widget _buildTodayAttendanceSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -502,6 +506,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat card detail absensi hari ini (izin atau hadir).
   Widget _buildAttendanceCard(dynamic data) {
     if (data.status?.toLowerCase() == 'izin') {
       return Container(
@@ -590,6 +595,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
+  // Membuat baris info label dan value untuk detail absensi.
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -618,6 +624,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat section menu (misal: edit profil) di halaman profil.
   Widget _buildMenuSection(Profile profile) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -664,6 +671,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat item menu modern dengan icon, judul, dan aksi.
   Widget _buildModernMenuItem({
     required IconData icon,
     required String title,
@@ -721,6 +729,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // Membuat tombol logout di bagian bawah halaman profil.
   Widget _buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
@@ -775,6 +784,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 }
 
+// Kartu statistik modern untuk menampilkan jumlah hadir, izin, alpha.
 class _ModernStatCard extends StatelessWidget {
   final String label;
   final int count;

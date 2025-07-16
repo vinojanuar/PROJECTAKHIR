@@ -15,6 +15,7 @@ class _IzinScreenState extends State<IzinScreen> {
   final TextEditingController _alasanController = TextEditingController();
   bool _isSubmitting = false; // To manage button state during submission
 
+  // Fungsi untuk mengajukan izin (leave request) ke API dan menangani hasilnya.
   Future<void> _ajukanIzin() async {
     // Validate form fields
     if (!_formKey.currentState!.validate()) {
@@ -62,6 +63,7 @@ class _IzinScreenState extends State<IzinScreen> {
     }
   }
 
+  // Widget utama IzinScreen yang menampilkan form pengajuan izin.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

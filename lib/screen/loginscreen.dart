@@ -5,6 +5,7 @@ import 'package:projectakhir/screen/registerscreen.dart'; // Pastikan path ini b
 import 'package:projectakhir/widget/copyright_footer.dart';
 
 // Helper untuk SnackBar
+// Fungsi ini menampilkan SnackBar custom dengan pesan dan warna tertentu di context yang diberikan.
 void showCustomSnackBar(BuildContext context, String message, Color color) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -42,6 +43,7 @@ class _LoginscreenState extends State<Loginscreen> {
   static const Color _hintColor = Color(0xFF94A3B8);
 
   // Input Decoration yang di-reuse
+  // Membuat dekorasi input yang seragam untuk TextField di form login.
   InputDecoration _commonInputDecoration({
     required String hintText,
     required IconData prefixIcon,
@@ -70,6 +72,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Fungsi untuk melakukan proses login user. Memanggil API login, menampilkan loading, dan menavigasi ke HomeScreen jika berhasil.
   void _login() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       showCustomSnackBar(
@@ -121,6 +124,7 @@ class _LoginscreenState extends State<Loginscreen> {
     }
   }
 
+  // Widget utama yang membangun tampilan halaman login.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,6 +180,7 @@ class _LoginscreenState extends State<Loginscreen> {
 
   // --- Widget Builders untuk UI yang Lebih Bersih ---
 
+  // Membuat header dengan gradient dan icon aplikasi di bagian atas halaman login.
   Widget _buildHeaderSection() {
     return Container(
       height: 280,
@@ -238,6 +243,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat lingkaran background dekoratif di header.
   Widget _buildBackgroundCircle({
     double? top,
     double? bottom,
@@ -262,6 +268,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat icon aplikasi di header.
   Widget _buildAppIcon() {
     return Container(
       width: 64,
@@ -286,6 +293,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat teks sambutan di halaman login.
   Widget _buildWelcomeText() {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,6 +319,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat field input (email/password) dengan label, hint, dan icon.
   Widget _buildInputField({
     required TextEditingController controller,
     required String label,
@@ -373,6 +382,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat link "Forgot Password?" yang menampilkan pesan jika ditekan.
   Widget _buildForgotPasswordLink() {
     return Align(
       alignment: Alignment.centerRight,
@@ -397,6 +407,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat tombol Sign In dengan efek loading saat proses login berlangsung.
   Widget _buildSignInButton() {
     return Container(
       width: double.infinity,
@@ -448,6 +459,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat garis pembatas "atau" di antara tombol Sign In dan Sign Up.
   Widget _buildOrDivider() {
     return const Row(
       children: [
@@ -478,6 +490,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membuat link ke halaman Sign Up (register) di bawah tombol login.
   Widget _buildSignUpLink() {
     return Center(
       child: Container(
@@ -521,6 +534,7 @@ class _LoginscreenState extends State<Loginscreen> {
     );
   }
 
+  // Membersihkan controller saat widget di-dispose untuk mencegah memory leak.
   @override
   void dispose() {
     _emailController.dispose();

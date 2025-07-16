@@ -14,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  // Fungsi yang dijalankan saat SplashScreen dimulai, untuk navigasi otomatis setelah delay.
   @override
   void initState() {
     super.initState();
@@ -22,6 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
+  // Fungsi untuk menentukan navigasi user ke HomeScreen atau LoginScreen berdasarkan token.
   Future<void> navigateUser() async {
     String? token = await PreferenceHandler.getToken();
     if (!mounted) return;
@@ -38,6 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  // Widget utama SplashScreen yang menampilkan logo dan nama aplikasi.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
