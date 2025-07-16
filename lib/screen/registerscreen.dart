@@ -358,7 +358,7 @@ class _RegisscreenState extends State<Regisscreen> {
             children: [
               // Header Section with Gradient (same as LoginScreen)
               Container(
-                height: 250,
+                height: 300,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
