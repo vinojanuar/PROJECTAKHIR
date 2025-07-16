@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projectakhir/api/user_api.dart'; // Pastikan path ini benar
 import 'package:projectakhir/screen/homescreen.dart'; // Pastikan path ini benar
 import 'package:projectakhir/screen/registerscreen.dart'; // Pastikan path ini benar
+import 'package:projectakhir/widget/copyright_footer.dart';
 
 // Helper untuk SnackBar
 void showCustomSnackBar(BuildContext context, String message, Color color) {
@@ -162,6 +163,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     const SizedBox(height: 32),
                     _buildSignUpLink(),
                     const SizedBox(height: 20),
+                    const CopyrightFooter(),
                   ],
                 ),
               ),

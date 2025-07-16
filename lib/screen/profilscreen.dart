@@ -8,8 +8,9 @@ import 'package:projectakhir/model/absenstatus_model.dart';
 import 'package:projectakhir/model/absentoday_model.dart';
 import 'package:projectakhir/model/profile_model.dart';
 import 'package:projectakhir/screen/editprofile_screen.dart';
-import 'package:projectakhir/screen/loginscreen.dart';
 import 'package:projectakhir/screen/homescreen.dart';
+import 'package:projectakhir/screen/loginscreen.dart';
+import 'package:projectakhir/widget/copyright_footer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -170,6 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                               // Logout Button
                               _buildLogoutButton(),
                               const SizedBox(height: 32),
+                              const CopyrightFooter(),
                             ],
                           ),
                         ),

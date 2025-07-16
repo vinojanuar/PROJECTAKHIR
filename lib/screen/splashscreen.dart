@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:projectakhir/helper/preference.dart';
+import 'package:projectakhir/screen/homescreen.dart';
 import 'package:projectakhir/screen/loginscreen.dart';
+import 'package:projectakhir/widget/copyright_footer.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,13 +18,24 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 4), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Loginscreen()),
-        );
-      }
+      navigateUser();
     });
+  }
+
+  Future<void> navigateUser() async {
+    String? token = await PreferenceHandler.getToken();
+    if (!mounted) return;
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Loginscreen()),
+      );
+    }
   }
 
   @override
@@ -60,6 +75,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 32),
+            const CopyrightFooter(),
           ],
         ),
       ),

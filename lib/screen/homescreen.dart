@@ -7,13 +7,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:projectakhir/api/absensi_service.dart';
 import 'package:projectakhir/api/profile_service.dart';
-import 'package:projectakhir/endpoint/endpoint.dart';
 import 'package:projectakhir/model/historyabsen_model.dart';
 import 'package:projectakhir/model/profile_model.dart';
 import 'package:projectakhir/screen/checkin_screen.dart';
 import 'package:projectakhir/screen/maps_screen.dart';
 import 'package:projectakhir/screen/profilscreen.dart';
 import 'package:projectakhir/screen/riwayatkehadiranscreen.dart';
+import 'package:projectakhir/widget/copyright_footer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -721,6 +721,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     const SizedBox(height: 100), // Space for floating button
+                    const CopyrightFooter(),
                   ],
                 ),
               ),

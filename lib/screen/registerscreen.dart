@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projectakhir/api/user_api.dart';
 import 'package:projectakhir/screen/loginscreen.dart';
+import 'package:projectakhir/widget/copyright_footer.dart';
 
 class Regisscreen extends StatefulWidget {
   const Regisscreen({super.key});
@@ -804,6 +805,7 @@ class _RegisscreenState extends State<Regisscreen> {
                           ),
 
                           const SizedBox(height: 20),
+                          const CopyrightFooter(),
                         ],
                       ),
                     ),
